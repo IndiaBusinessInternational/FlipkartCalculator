@@ -796,7 +796,7 @@ function bindDynamic() {
 /* ====================================================================
    v3 EXTRAS — branding, live clock, theme toggle, saved memory, PWA
    ==================================================================== */
-const APP_VERSION = "3.0";
+const APP_VERSION = "3.1";
 const SAVED_KEY = "ibi_calc_saved_v1";
 const THEME_KEY = "ibi_calc_theme";
 const INSTALL_DISMISS_KEY = "ibi_calc_install_dismissed";
@@ -810,6 +810,7 @@ function initExtras() {
   $("verChip").addEventListener("click", () => openMenu(true));
   const pd = $("priceDate");
   if (pd && !pd.value) pd.value = todayISO();
+  $("btnQuote").addEventListener("click", shareQuote);
   initClock();
   initTheme();
   initMenu();
@@ -1023,6 +1024,157 @@ async function doInstall() {
   try { await deferredInstallPrompt.userChoice; } catch (e) {}
   deferredInstallPrompt = null;
   $("installBar").hidden = true;
+}
+
+/* ---- one-tap Share / Print Quote ---- */
+function buildQuoteData() {
+  const c = gatherCtx();
+  const price = roundPrice(solvePrice(c, c.platform), c.rounding);
+  const e = economicsAt(price, c, c.platform);
+  const name = ($("productName") && $("productName").value.trim()) ||
+    (CATEGORIES[+$("category").value] ? CATEGORIES[+$("category").value][0] : "Product");
+  const date = ($("priceDate") && $("priceDate").value) ? $("priceDate").value : todayISO();
+  return { c, price, e, name, date };
+}
+function formatQuoteDate(iso) {
+  const p = String(iso).split("-");
+  if (p.length !== 3) return String(iso);
+  const d = new Date(+p[0], +p[1] - 1, +p[2]);
+  return `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}, ${WEEKDAYS[d.getDay()]}`;
+}
+function quoteText(q) {
+  const plat = q.c.platform === "shopsy" ? "Shopsy" : "Flipkart";
+  const tier = (TIER_INFO[q.c.tier] || TIER_INFO.silver).label;
+  return `IBI Price Quote — ${q.name}\n` +
+    `${formatQuoteDate(q.date)} · ${plat} (${tier} tier)\n` +
+    `Recommended retail price (incl GST): ${inr2(q.price)}\n` +
+    `Net settlement: ${inr2(q.e.settlement)} · Net profit: ${inr2(q.e.profit)} (${pct((q.e.profit / q.e.taxable) * 100)})\n` +
+    `— India Business International · eCommerce for the World`;
+}
+function clip(s, n) { s = String(s); return s.length > n ? s.slice(0, n - 1) + "…" : s; }
+function roundRectPath(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+function drawIBILogoCanvas(ctx, cx, topY, targetW) {
+  const s = targetW / 545;
+  ctx.save();
+  ctx.translate(cx - targetW / 2, topY);
+  ctx.scale(s, s);
+  ctx.fillStyle = "#00c5ff";
+  const cols = [24, 58, 92, 126, 160], rows = [24, 58, 92, 126, 160], radii = [4.5, 7.5, 10.5, 13.5, 16.5];
+  rows.forEach((ry) => cols.forEach((cxx, i) => { ctx.beginPath(); ctx.arc(cxx, ry, radii[i], 0, Math.PI * 2); ctx.fill(); }));
+  ctx.strokeStyle = "#00c5ff"; ctx.lineWidth = 2.5;
+  ctx.beginPath(); ctx.moveTo(198, 14); ctx.lineTo(198, 170); ctx.stroke();
+  ctx.textAlign = "left"; ctx.textBaseline = "alphabetic"; ctx.fillStyle = "#00c5ff";
+  ctx.font = "800 40px Roboto, 'Segoe UI', sans-serif";
+  ctx.fillText("INDIA", 220, 55);
+  ctx.fillText("BUSINESS", 220, 101);
+  ctx.fillText("INTERNATIONAL", 220, 147);
+  ctx.fillStyle = "rgba(0,197,255,0.7)";
+  ctx.font = "400 20px Roboto, 'Segoe UI', sans-serif";
+  ctx.fillText("eCommerce for the World", 222, 178);
+  ctx.restore();
+}
+function drawQuoteImage(q) {
+  const W = 1080, H = 1080;
+  const canvas = document.createElement("canvas");
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = "#06080c"; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = "#00c5ff"; ctx.fillRect(0, 0, W, 8);
+  drawIBILogoCanvas(ctx, W / 2, 80, 720);
+  const plat = q.c.platform === "shopsy" ? "Shopsy" : "Flipkart";
+  const tier = (TIER_INFO[q.c.tier] || TIER_INFO.silver).label;
+  ctx.textAlign = "center";
+  ctx.fillStyle = "#00c5ff"; ctx.font = "700 26px Roboto, sans-serif";
+  ctx.fillText("P R I C E   Q U O T E", W / 2, 410);
+  ctx.fillStyle = "#ffffff"; ctx.font = "800 46px Roboto, sans-serif";
+  ctx.fillText(clip(q.name, 26), W / 2, 472);
+  ctx.fillStyle = "#9aa6b4"; ctx.font = "400 24px Roboto, sans-serif";
+  ctx.fillText(`${formatQuoteDate(q.date)}  ·  ${plat}  ·  ${tier} tier`, W / 2, 510);
+  roundRectPath(ctx, 140, 548, W - 280, 150, 18);
+  ctx.fillStyle = "#0c2230"; ctx.fill();
+  ctx.strokeStyle = "rgba(0,197,255,.5)"; ctx.lineWidth = 2; ctx.stroke();
+  ctx.fillStyle = "#7fd6f2"; ctx.font = "700 20px Roboto, sans-serif";
+  ctx.fillText("RECOMMENDED RETAIL PRICE (INCL. GST)", W / 2, 602);
+  ctx.fillStyle = "#00c5ff"; ctx.font = "800 64px Roboto, sans-serif";
+  ctx.fillText(inr(q.price), W / 2, 670);
+  const stats = [
+    ["Net settlement", inr(q.e.settlement)],
+    ["Net profit/unit", inr2(q.e.profit)],
+    ["Net margin", pct((q.e.profit / q.e.taxable) * 100)],
+  ];
+  const colW = (W - 200) / 3;
+  stats.forEach((st, i) => {
+    const x = 100 + colW * i + colW / 2;
+    ctx.fillStyle = "#ffffff"; ctx.font = "800 30px Roboto, sans-serif"; ctx.fillText(st[1], x, 772);
+    ctx.fillStyle = "#8fa0b3"; ctx.font = "400 18px Roboto, sans-serif"; ctx.fillText(st[0], x, 800);
+  });
+  const lines = [
+    ["Wholesale price (WSP)", "− " + inr2(q.c.wsp)],
+    ["Packing + labour", "− " + inr2(q.c.packing + q.c.labour)],
+    [`${plat} fees + GST`, "− " + inr2(q.e.feesExGst + q.e.feeGST)],
+    [`Return provision (${pct(q.c.returnRate * 100)})`, "− " + inr2(q.e.returnProvision)],
+  ];
+  let y = 872;
+  ctx.font = "400 24px Roboto, sans-serif";
+  lines.forEach((ln) => {
+    ctx.textAlign = "left"; ctx.fillStyle = "#aeb9c6"; ctx.fillText(ln[0], 120, y);
+    ctx.textAlign = "right"; ctx.fillStyle = "#e9eef5"; ctx.fillText(ln[1], W - 120, y);
+    y += 42;
+  });
+  ctx.textAlign = "center"; ctx.fillStyle = "#5d6b7b"; ctx.font = "400 19px Roboto, sans-serif";
+  ctx.fillText("Generated by IBI Flipkart & Shopsy Pricing Calculator · v" + APP_VERSION, W / 2, 1042);
+  return canvas;
+}
+function printQuote(q) {
+  const plat = q.c.platform === "shopsy" ? "Shopsy" : "Flipkart";
+  const tier = (TIER_INFO[q.c.tier] || TIER_INFO.silver).label;
+  $("quoteBody").innerHTML =
+    `<div class="qs-product">${escapeHtml(q.name)}</div>` +
+    `<div class="qs-meta">${formatQuoteDate(q.date)} · ${plat} · ${escapeHtml(tier)} tier</div>` +
+    `<div class="qs-price"><span>Recommended Retail Price (incl. GST)</span><b>${inr(q.price)}</b></div>` +
+    `<table>` +
+      `<tr><td>Taxable sale value</td><td>${inr2(q.e.taxable)}</td></tr>` +
+      `<tr><td>${plat} fees + 18% GST</td><td>− ${inr2(q.e.feesExGst + q.e.feeGST)}</td></tr>` +
+      `<tr><td>Net settlement to bank</td><td>${inr2(q.e.settlement)}</td></tr>` +
+      `<tr><td>Wholesale price (WSP)</td><td>− ${inr2(q.c.wsp)}</td></tr>` +
+      `<tr><td>Packing + labour</td><td>− ${inr2(q.c.packing + q.c.labour)}</td></tr>` +
+      `<tr><td>Return provision (${pct(q.c.returnRate * 100)})</td><td>− ${inr2(q.e.returnProvision)}</td></tr>` +
+      `<tr><td><b>Net profit / unit</b></td><td><b>${inr2(q.e.profit)} (${pct((q.e.profit / q.e.taxable) * 100)})</b></td></tr>` +
+    `</table>`;
+  document.body.classList.add("quote-mode");
+  const cleanup = () => { document.body.classList.remove("quote-mode"); window.removeEventListener("afterprint", cleanup); };
+  window.addEventListener("afterprint", cleanup);
+  window.print();
+  setTimeout(cleanup, 2000);
+}
+async function shareQuote() {
+  const q = buildQuoteData();
+  if (q.e.profit < 0 && !confirm("This product is at a LOSS at the current price. Share the quote anyway?")) return;
+  const text = quoteText(q);
+  try {
+    const canvas = drawQuoteImage(q);
+    const blob = await new Promise((r) => canvas.toBlob(r, "image/png"));
+    if (blob) {
+      const file = new File([blob], "IBI-price-quote.png", { type: "image/png" });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ title: "IBI Price Quote", text, files: [file] });
+        return;
+      }
+    }
+  } catch (err) { if (err && err.name === "AbortError") return; }
+  if (navigator.share) {
+    try { await navigator.share({ title: "IBI Price Quote", text, url: location.href }); return; }
+    catch (err) { if (err && err.name === "AbortError") return; }
+  }
+  printQuote(q); // desktop fallback → clean printable quote (Save as PDF)
 }
 
 document.addEventListener("DOMContentLoaded", init);

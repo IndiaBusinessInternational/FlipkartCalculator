@@ -1,0 +1,11 @@
+v3.1 - one-tap Share/Print Quote, social banners, dark palette tuning
+
+- Share/Print Quote: generates a branded quote PNG (IBI logo + price +
+  breakdown) for the native share sheet on mobile; clean printable PDF on
+  desktop (canvas-rendered, no libraries)
+- Twitter/X header (1500x500) + OG link-preview banner (1200x630) generated
+  from the brand mark; Open Graph + Twitter card meta added
+- Dark theme retuned: deeper blue-tinted surfaces, brighter cyan, input glow
+- Version bumped to v3.1; service-worker cache -> ibi-calc-v3.1.0
+
+Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
