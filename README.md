@@ -20,7 +20,7 @@ It also factors in everything that quietly eats margin:
 | Built-in | Detail |
 |---|---|
 | **Platform commission** | Category-wise %, with Flipkart's **0% commission under ₹1,000** rule and **Shopsy's 0% commission** |
-| **Fixed / closing fee** | Price-slab based, Self-ship (NFBF) vs Flipkart-fulfilled (FBF) |
+| **Fixed / closing fee** | Price-slab based, **per seller tier** (Bronze / Silver / Gold / Diamond) and Self-ship (NFBF) vs Flipkart-fulfilled (FBF) |
 | **eKart shipping** | **Local / Regional / National** zone rate card by weight slab, incl. free sub-500 g local/zonal |
 | **Collection fee** | Blended Prepaid (2%) / COD (2.5%) by your COD share |
 | **GST on fees** | 18%, with an **Input Tax Credit (ITC)** toggle for registered sellers |
@@ -29,6 +29,7 @@ It also factors in everything that quietly eats margin:
 | **Target profit** | 25% default, editable — as *markup on cost* or *margin on price* |
 
 ### Extra value (things worth not leaving out)
+- **Seller tier selector** — Bronze / Silver / Gold / Diamond; auto-loads that tier's fixed-fee defaults and indicative settlement days, and remembers your edits per tier
 - **Flipkart vs Shopsy** side-by-side for the same target profit
 - **Market price** — estimated **min / max / average** band, or real figures from competitor prices you enter
 - **Breakeven price**, net margin, markup and return-on-cost KPIs
@@ -93,7 +94,7 @@ GST treatment: the retail price is quoted **GST-inclusive**. For a registered se
 
 ## ⚠️ Disclaimer
 
-Fee defaults reflect **Flipkart's November-2025 rate revision (Gold tier)** as published in **mid-2026** and are **indicative**. Actual commission, fixed fee and eKart rates vary by **seller tier, category, sub-category** and your specific rate card. Always confirm in **Flipkart Seller Hub → Reports → My Commission Structure** and overwrite the editable rate card in the app.
+Fee defaults reflect **Flipkart's November-2025 rate revision** as published in **mid-2026** and are **indicative**. The Gold-tier fixed fee is the researched baseline; Bronze/Silver/Diamond values are scaled estimates. Actual commission, fixed fee and eKart rates vary by **seller tier, category, sub-category** and your specific rate card. Always confirm in **Flipkart Seller Hub → Reports → My Commission Structure** and overwrite the editable rate card in the app.
 
 Not affiliated with, endorsed by, or sponsored by Flipkart or Shopsy. All trademarks belong to their respective owners.
 

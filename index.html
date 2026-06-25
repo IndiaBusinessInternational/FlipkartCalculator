@@ -161,6 +161,20 @@
             <div class="inputgroup"><input type="number" id="commission" step="0.1" min="0" /><span class="suffix">%</span></div>
           </label>
         </div>
+        <div class="grid2" style="margin-top:10px">
+          <label class="field"><span class="lbl">Seller tier <span class="hint" title="Your Flipkart Seller Hub tier. Higher tiers pay lower fixed (closing) fees and get faster settlement. Sets the fixed-fee defaults — editable in Advanced Fee Settings.">ⓘ</span></span>
+            <select id="tier">
+              <option value="bronze">Bronze</option>
+              <option value="silver" selected>Silver</option>
+              <option value="gold">Gold</option>
+              <option value="diamond">Diamond</option>
+            </select>
+          </label>
+          <label class="field"><span class="lbl">Indicative settlement</span>
+            <input type="text" id="tierPayInfo" value="~7 days" readonly style="background:#fafbfc;color:var(--muted)" />
+          </label>
+        </div>
+        <div class="note" id="tierNote" style="padding:8px 0 0;background:none;border:none"></div>
         <label class="toggle" style="margin-top:8px"><input type="checkbox" id="zeroUnder1000" checked /> Apply Flipkart 0% commission for items priced under ₹1,000</label>
       </div>
     </div>
@@ -332,7 +346,7 @@
     <div class="card">
       <h2><span class="ic">⚙️</span> Advanced Fee Settings (editable rate card)</h2>
       <div class="body">
-        <p class="note" style="padding:0 0 8px;background:none;border:none">Defaults reflect Flipkart's Nov-2025 revision (Gold tier) as published mid-2026. Exact rates depend on your seller tier / sub-category — overwrite any cell with the figures from your <b>Seller Hub → Reports → My Commission Structure</b>. Changes are saved in your browser.</p>
+        <p class="note" style="padding:0 0 8px;background:none;border:none">Defaults reflect Flipkart's Nov-2025 revision as published mid-2026. The fixed-fee table below auto-loads defaults for your <b>selected seller tier</b> (set it in Platform &amp; Product) and your edits are remembered per tier. Exact rates depend on your tier / sub-category — overwrite any cell with the figures from your <b>Seller Hub → Reports → My Commission Structure</b>. Changes are saved in your browser.</p>
 
         <div class="grid2">
           <label class="field"><span class="lbl">Collection fee — Prepaid</span><div class="inputgroup"><input type="number" id="collPrepaid" step="0.1" min="0" value="2" /><span class="suffix">%</span></div></label>
@@ -349,7 +363,7 @@
         </div>
 
         <details class="adv" style="margin-top:12px" open>
-          <summary>Fixed (closing) fee by price slab — ₹</summary>
+          <summary id="fixedSummary">Fixed (closing) fee by price slab — ₹</summary>
           <div class="inner">
             <table class="fees">
               <thead><tr><th>Order value up to (₹)</th><th>Self-ship (NFBF)</th><th>Flipkart (FBF)</th></tr></thead>
