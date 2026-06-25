@@ -1,6 +1,7 @@
 # Local preview server logs / artifacts
 .serve.log
 .serve.log.out
+.commitmsg.tmp
 
 # Claude Code local preview config (machine-specific absolute paths)
 .claude/
