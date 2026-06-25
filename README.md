@@ -29,7 +29,7 @@ It also factors in everything that quietly eats margin:
 | **Target profit** | 25% default, editable — as *markup on cost* or *margin on price* |
 
 ### Extra value (things worth not leaving out)
-- **Seller tier selector** — Bronze / Silver / Gold / Diamond; auto-loads that tier's fixed-fee defaults and indicative settlement days, and remembers your edits per tier
+- **Seller tier selector** — Bronze / Silver / Gold / Diamond. Models Flipkart's real tier mechanism: Silver & Gold pay the same **Base Rate Card**, **Bronze = Base + ₹10**/order, **Diamond = Base − ₹15** (up to ₹30); exact settlement days **15 / 10 / 3 / 2**. The ₹10 surcharge and ₹15 discount are editable.
 - **Flipkart vs Shopsy** side-by-side for the same target profit
 - **Market price** — estimated **min / max / average** band, or real figures from competitor prices you enter
 - **Breakeven price**, net margin, markup and return-on-cost KPIs
@@ -94,7 +94,7 @@ GST treatment: the retail price is quoted **GST-inclusive**. For a registered se
 
 ## ⚠️ Disclaimer
 
-Fee defaults reflect **Flipkart's November-2025 rate revision** as published in **mid-2026** and are **indicative**. The Gold-tier fixed fee is the researched baseline; Bronze/Silver/Diamond values are scaled estimates. Actual commission, fixed fee and eKart rates vary by **seller tier, category, sub-category** and your specific rate card. Always confirm in **Flipkart Seller Hub → Reports → My Commission Structure** and overwrite the editable rate card in the app.
+Fee defaults reflect **Flipkart's November-2025 rate revision** as published in **mid-2026** and are **indicative**. The tier mechanism (Silver/Gold = Base Rate Card, Bronze = Base + ₹10, Diamond = Base − ₹15 up to ₹30, settlement 15/10/3/2 days) is taken from **Seller Hub → Tier Criteria & Benefits**; the Base Rate Card slab amounts themselves are the researched Nov-2025 figures and may differ for your category/sub-category. Always confirm in **Flipkart Seller Hub → Reports → My Commission Structure** and overwrite the editable rate card in the app.
 
 Not affiliated with, endorsed by, or sponsored by Flipkart or Shopsy. All trademarks belong to their respective owners.
 

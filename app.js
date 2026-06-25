@@ -43,30 +43,32 @@ const CATEGORIES = [
 // tiers are scaled, indicative defaults — all editable & remembered per tier.
 const BIG = 1e12; // sentinel for "no upper bound" (JSON-safe, unlike Infinity)
 const SLAB_CAPS = [250, 500, 1000, 5000, BIG];
-const TIER_FEE = {
-  bronze:  { nfbf: [16, 27, 45, 98, 135], fbf: [13, 21, 36, 75, 105] },
-  silver:  { nfbf: [13, 22, 36, 78, 108], fbf: [11, 17, 29, 60, 84] },
-  gold:    { nfbf: [11, 18, 30, 65, 90],  fbf: [9, 14, 24, 50, 70] },
-  diamond: { nfbf: [10, 16, 27, 58, 80],  fbf: [8, 12, 21, 44, 62] },
-};
+// Base Rate Card = the fixed/closing fee that SILVER & GOLD both pay
+// (Nov-2025 baseline). Editable in the UI. [upTo, NFBF, FBF]
+const BASE_FIXED = [
+  { upTo: 250,  nfbf: 11, fbf: 9 },
+  { upTo: 500,  nfbf: 18, fbf: 14 },
+  { upTo: 1000, nfbf: 30, fbf: 24 },
+  { upTo: 5000, nfbf: 65, fbf: 50 },
+  { upTo: BIG,  nfbf: 90, fbf: 70 },
+];
+// Per-tier treatment from Flipkart Seller Hub "Tier Criteria & Benefits"
+// (verified Jun 2026). Fixed fee = base card adjusted per tier; settlement
+// days are exact. Bronze +₹10 · Silver/Gold = base · Diamond −₹15 (up to ₹30).
 const TIER_INFO = {
-  bronze:  { label: "Bronze",  pay: "~10–12 days" },
-  silver:  { label: "Silver",  pay: "~7 days" },
-  gold:    { label: "Gold",    pay: "~5 days" },
-  diamond: { label: "Diamond", pay: "2 days" },
+  bronze:  { label: "Bronze",  pay: "15 days", adj: "Base + ₹10" },
+  silver:  { label: "Silver",  pay: "10 days", adj: "Base Rate Card" },
+  gold:    { label: "Gold",    pay: "3 days",  adj: "Base Rate Card" },
+  diamond: { label: "Diamond", pay: "2 days",  adj: "Base − ₹15 (up to ₹30)" },
 };
 const DEFAULT_TIER = "silver";
-// Build a [{upTo,nfbf,fbf}] table for a tier.
-function tierTable(tier) {
-  const t = TIER_FEE[tier] || TIER_FEE.silver;
-  return SLAB_CAPS.map((upTo, i) => ({ upTo, nfbf: t.nfbf[i], fbf: t.fbf[i] }));
-}
-// Live, editable per-tier tables (deep copies of defaults). Persisted.
-let tierTables = {};
-function freshTierTables() {
-  return { bronze: tierTable("bronze"), silver: tierTable("silver"), gold: tierTable("gold"), diamond: tierTable("diamond") };
-}
 let activeTier = DEFAULT_TIER;
+// Apply the tier adjustment to a base fixed (closing) fee.
+function tierAdjustFixed(base, tier, bronzeAdd, diamondSub) {
+  if (tier === "bronze") return base + bronzeAdd;
+  if (tier === "diamond") return Math.max(0, base - diamondSub);
+  return base; // silver & gold pay the base rate card unchanged
+}
 
 // eKart forward shipping rate card. [upTo grams, local, zonal, national]
 const DEFAULT_SHIP = [
@@ -141,16 +143,9 @@ function readFixedTable() {
   return rows;
 }
 
-// Save the currently-displayed fixed-fee edits back into the active tier.
-function syncActiveTier() {
-  tierTables[activeTier] = readFixedTable();
-}
-// Switch tier: remember current edits, load the new tier's table.
+// Switch tier — there is ONE shared base rate card, so this only relabels.
 function loadTier(tier) {
-  syncActiveTier();
   activeTier = tier;
-  buildFixedTable(tierTables[tier]);
-  bindDynamic();
   updateTierUI();
 }
 function updateTierUI() {
@@ -159,10 +154,10 @@ function updateTierUI() {
   const note = $("tierNote");
   if (note)
     note.innerHTML =
-      `Loaded <b>${info.label}</b>-tier fixed-fee defaults · indicative settlement <b>${info.pay}</b>. ` +
-      `Higher tiers pay lower closing fees &amp; settle faster — switch tier to compare.`;
+      `<b>${info.label}</b> tier · fixed fee = <b>${info.adj}</b> · payment in <b>${info.pay}</b>. ` +
+      `Silver &amp; Gold share the base rate card; Bronze adds ₹10/order, Diamond saves up to ₹30/order &amp; settles fastest.`;
   const fs = $("fixedSummary");
-  if (fs) fs.textContent = `Fixed (closing) fee by price slab — ₹ · ${info.label} tier`;
+  if (fs) fs.textContent = "Base Rate Card — fixed (closing) fee by slab (Silver/Gold base)";
 }
 function readShipTable() {
   const rows = JSON.parse(JSON.stringify(DEFAULT_SHIP));
@@ -236,6 +231,8 @@ function gatherCtx() {
     commBase: $("commBase").value,
 
     tier: activeTier,
+    bronzeAdd: num("bronzeAdd", 10),
+    diamondSub: num("diamondSub", 15),
     zone, weight, fulfil,
     fixed, ship, beyond,
     forwardShip: shippingFor(zone, weight, ship, beyond),
@@ -272,8 +269,10 @@ function economicsAt(sp, c, platform) {
     const rate = c.zeroUnder1000 && sp < 1000 ? 0 : c.commission;
     commission = rate * base;
   }
-  // Fixed (Shopsy = 0)
-  const fixed = isShopsy ? 0 : fixedFeeFor(sp, c.fixed, c.fulfil);
+  // Fixed (Shopsy = 0); Flipkart = base rate card adjusted for seller tier
+  const fixed = isShopsy
+    ? 0
+    : tierAdjustFixed(fixedFeeFor(sp, c.fixed, c.fulfil), c.tier, c.bronzeAdd, c.diamondSub);
   // Shipping & collection apply to both platforms (eKart)
   const shipping = c.forwardShip;
   const collRate = c.codShare * c.collCod + (1 - c.codShare) * c.collPrepaid;
@@ -419,7 +418,7 @@ function render() {
 
     <tr class="head"><td>${isShopsy ? "Shopsy" : "Flipkart"} fees (deducted at settlement)</td><td></td></tr>
     <tr class="sub"><td>Commission${isShopsy ? " (0% on Shopsy)" : (c.zeroUnder1000 && e.sp < 1000 ? " (0% under ₹1,000)" : ` (${pct(c.commission*100)})`)}</td><td>−${inr2(e.commission)}</td></tr>
-    <tr class="sub"><td>Fixed / closing fee${isShopsy ? " (waived)" : ` (${(TIER_INFO[c.tier]||TIER_INFO.silver).label} tier)`}</td><td>−${inr2(e.fixed)}</td></tr>
+    <tr class="sub"><td>Fixed / closing fee${isShopsy ? " (waived)" : ` (${(TIER_INFO[c.tier]||TIER_INFO.silver).label}: ${(TIER_INFO[c.tier]||TIER_INFO.silver).adj})`}</td><td>−${inr2(e.fixed)}</td></tr>
     <tr class="sub"><td>eKart shipping (${labelZone(c.zone)}, ${c.weight} g)</td><td>−${inr2(e.shipping)}</td></tr>
     <tr class="sub"><td>Collection fee (${pct(e.collRate*100)} blended)</td><td>−${inr2(e.collection)}</td></tr>
     <tr class="sub"><td>GST on fees (${pct(c.feeGst*100)})${c.claimITC ? " — reclaimed via ITC" : ""}</td><td>−${inr2(e.feeGST)}</td></tr>
@@ -597,15 +596,14 @@ function calcVol() {
 
 /* ----------------------- Persistence -------------------------------- */
 function saveState() {
-  syncActiveTier(); // capture current fixed-fee edits into the active tier
   const data = {};
   document.querySelectorAll("input,select").forEach((el) => {
-    if (!el.id) return; // table cells have no id and are saved via __tierTables/__ship
+    if (!el.id) return; // table cells have no id and are saved via __fixed/__ship
     data[el.id] = el.type === "checkbox" ? el.checked : el.value;
   });
   data.__platform = window.__platform;
   data.__activeTier = activeTier;
-  data.__tierTables = tierTables;
+  data.__fixed = readFixedTable();
   data.__comps = getCompetitorPrices();
   data.__ship = readShipTable();
   try { localStorage.setItem(STORE_KEY, JSON.stringify(data)); } catch (e) {}
@@ -614,9 +612,8 @@ function loadState() {
   let data;
   try { data = JSON.parse(localStorage.getItem(STORE_KEY)); } catch (e) {}
   if (!data) return false;
-  tierTables = data.__tierTables && data.__tierTables.silver ? data.__tierTables : freshTierTables();
   activeTier = data.__activeTier || DEFAULT_TIER;
-  buildFixedTable(tierTables[activeTier] || tierTable(activeTier));
+  buildFixedTable(data.__fixed && data.__fixed.length ? data.__fixed : BASE_FIXED);
   if (data.__ship) buildShipTable(data.__ship);
   Object.keys(data).forEach((k) => {
     const el = $(k);
@@ -706,9 +703,8 @@ function debounce(fn, ms) {
 /* ----------------------------- Init --------------------------------- */
 function init() {
   buildCategoryOptions();
-  tierTables = freshTierTables();
   activeTier = DEFAULT_TIER;
-  buildFixedTable(tierTables[activeTier]);
+  buildFixedTable(BASE_FIXED);
   buildShipTable(DEFAULT_SHIP);
   setPlatform("flipkart");
 
@@ -759,9 +755,9 @@ function init() {
 
   // Reset fees
   $("resetFees").addEventListener("click", () => {
-    tierTables = freshTierTables();
-    buildFixedTable(tierTables[activeTier]);
+    buildFixedTable(BASE_FIXED);
     buildShipTable(DEFAULT_SHIP);
+    $("bronzeAdd").value = 10; $("diamondSub").value = 15;
     $("shipBeyondLocal").value = 10; $("shipBeyondZonal").value = 12; $("shipBeyondNational").value = 15;
     $("revLocal").value = 65; $("revZonal").value = 85; $("revNational").value = 105; $("revPer500").value = 30;
     $("collPrepaid").value = 2; $("collCod").value = 2.5; $("feeGst").value = 18;

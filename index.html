@@ -171,7 +171,7 @@
             </select>
           </label>
           <label class="field"><span class="lbl">Indicative settlement</span>
-            <input type="text" id="tierPayInfo" value="~7 days" readonly style="background:#fafbfc;color:var(--muted)" />
+            <input type="text" id="tierPayInfo" value="10 days" readonly style="background:#fafbfc;color:var(--muted)" />
           </label>
         </div>
         <div class="note" id="tierNote" style="padding:8px 0 0;background:none;border:none"></div>
@@ -363,12 +363,17 @@
         </div>
 
         <details class="adv" style="margin-top:12px" open>
-          <summary id="fixedSummary">Fixed (closing) fee by price slab — ₹</summary>
+          <summary id="fixedSummary">Base Rate Card — fixed (closing) fee by slab</summary>
           <div class="inner">
             <table class="fees">
               <thead><tr><th>Order value up to (₹)</th><th>Self-ship (NFBF)</th><th>Flipkart (FBF)</th></tr></thead>
               <tbody id="fixedTable"></tbody>
             </table>
+            <div class="grid2" style="margin-top:8px">
+              <label class="field"><span class="lbl">Bronze surcharge / order <span class="hint" title="Flipkart Tier Benefits: Bronze pays Base Rate + this amount per order.">ⓘ</span></span><div class="inputgroup prefixed"><span class="prefix">₹</span><input type="number" id="bronzeAdd" step="1" min="0" value="10" /></div></label>
+              <label class="field"><span class="lbl">Diamond discount / order <span class="hint" title="Flipkart Tier Benefits: Diamond pays Base Rate − this amount per order (up to ₹30 on higher-value orders).">ⓘ</span></span><div class="inputgroup prefixed"><span class="prefix">₹</span><input type="number" id="diamondSub" step="1" min="0" value="15" /></div></label>
+            </div>
+            <p class="note" style="padding:6px 0 0;background:none;border:none">Silver &amp; Gold pay this base card as-is · Bronze = Base + ₹10 · Diamond = Base − ₹15 (up to ₹30). Source: Seller Hub → Tier Criteria &amp; Benefits.</p>
           </div>
         </details>
 
