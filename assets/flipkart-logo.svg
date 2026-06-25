@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 120" role="img" aria-label="Flipkart">
+  <!-- blue tile with yellow shopping bag -->
+  <rect x="8" y="14" width="92" height="92" rx="16" fill="#2874F0"/>
+  <g fill="#FFE11B">
+    <path d="M40 44 h28 a4 4 0 0 1 4 4 v34 a4 4 0 0 1 -4 4 H40 a4 4 0 0 1 -4 -4 V48 a4 4 0 0 1 4 -4 z"/>
+    <path d="M46 46 v-4 a8 8 0 0 1 16 0 v4" fill="none" stroke="#FFE11B" stroke-width="3.4"/>
+  </g>
+  <rect x="44" y="56" width="20" height="3.4" fill="#2874F0"/>
+  <!-- wordmark -->
+  <text x="116" y="62" font-family="Roboto, 'Segoe UI', Arial, sans-serif" font-size="44" font-weight="700" font-style="italic" fill="#2874F0">Flipkart</text>
+  <g transform="translate(118,78)">
+    <path d="M0 7 L13 7 L3 15 L7 27 L-3 19 L-13 27 L-9 15 L-19 7 L-6 7 L0 -5 Z" fill="#FFE11B" transform="translate(8,0) scale(0.5)"/>
+    <text x="14" y="14" font-family="Roboto, 'Segoe UI', Arial, sans-serif" font-size="15" font-style="italic" fill="#878787">Explore <tspan fill="#FFA000" font-weight="700">Plus</tspan></text>
+  </g>
+</svg>

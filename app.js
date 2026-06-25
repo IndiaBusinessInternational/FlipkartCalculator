@@ -771,12 +771,13 @@ function init() {
   $("btnCsv").addEventListener("click", exportCSV);
   $("btnCopy").addEventListener("click", copySummary);
   $("btnReset").addEventListener("click", () => {
-    if (confirm("Reset all inputs to defaults? Your saved settings will be cleared.")) {
+    if (confirm("Reset all inputs to defaults? (Your saved calculations are kept.)")) {
       localStorage.removeItem(STORE_KEY);
       location.reload();
     }
   });
 
+  initExtras();
   bindDynamic();
   render();
 }
@@ -790,6 +791,238 @@ function bindDynamic() {
     el.addEventListener("input", recompute);
     el.addEventListener("change", recompute);
   });
+}
+
+/* ====================================================================
+   v3 EXTRAS — branding, live clock, theme toggle, saved memory, PWA
+   ==================================================================== */
+const APP_VERSION = "3.0";
+const SAVED_KEY = "ibi_calc_saved_v1";
+const THEME_KEY = "ibi_calc_theme";
+const INSTALL_DISMISS_KEY = "ibi_calc_install_dismissed";
+const INSTALL_REMIND_DAYS = 1; // re-show install banner far sooner than Chrome's 7 days
+const SAVED_MAX = 24;
+let deferredInstallPrompt = null;
+
+function initExtras() {
+  $("verChip").textContent = "v" + APP_VERSION;
+  if ($("menuVer")) $("menuVer").textContent = "v" + APP_VERSION;
+  $("verChip").addEventListener("click", () => openMenu(true));
+  const pd = $("priceDate");
+  if (pd && !pd.value) pd.value = todayISO();
+  initClock();
+  initTheme();
+  initMenu();
+  initSavedCalcs();
+  initPWA();
+}
+
+/* ---- date & live clock ---- */
+function todayISO() {
+  const d = new Date();
+  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+}
+const WEEKDAYS = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function formatDateTime(d) {
+  let h = d.getHours();
+  const ampm = h >= 12 ? "PM" : "AM";
+  h = h % 12 || 12;
+  const p = (n) => String(n).padStart(2, "0");
+  // e.g. "28 May 2026, Thursday, 01:38:00 PM"
+  return `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}, ${WEEKDAYS[d.getDay()]}, ${p(h)}:${p(d.getMinutes())}:${p(d.getSeconds())} ${ampm}`;
+}
+function initClock() {
+  const el = $("clock");
+  const tick = () => { el.textContent = formatDateTime(new Date()); };
+  tick();
+  setInterval(tick, 1000);
+}
+
+/* ---- theme (dark / light toggle) ---- */
+function applyTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+  const dark = theme === "dark";
+  if ($("themeToggle")) $("themeToggle").checked = dark;
+  if ($("themeToggleMenu")) $("themeToggleMenu").checked = dark;
+  try { localStorage.setItem(THEME_KEY, theme); } catch (e) {}
+}
+function initTheme() {
+  let theme;
+  try { theme = localStorage.getItem(THEME_KEY); } catch (e) {}
+  if (!theme) theme = (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) ? "dark" : "light";
+  applyTheme(theme);
+  const handler = (e) => applyTheme(e.target.checked ? "dark" : "light");
+  if ($("themeToggle")) $("themeToggle").addEventListener("change", handler);
+  if ($("themeToggleMenu")) $("themeToggleMenu").addEventListener("change", handler);
+}
+
+/* ---- settings menu ---- */
+function openMenu(open) {
+  $("settingsMenu").hidden = !open;
+  $("menuBtn").setAttribute("aria-expanded", String(!!open));
+}
+function initMenu() {
+  $("menuBtn").addEventListener("click", (e) => { e.stopPropagation(); openMenu($("settingsMenu").hidden); });
+  document.addEventListener("click", (e) => {
+    const m = $("settingsMenu");
+    if (!m.hidden && !m.contains(e.target) && e.target !== $("menuBtn")) openMenu(false);
+  });
+  $("menuClearMem").addEventListener("click", () => { clearAllSaved(); });
+}
+
+/* ---- saved calculations (local memory, up to 24) ---- */
+function loadSaved() { try { return JSON.parse(localStorage.getItem(SAVED_KEY)) || []; } catch (e) { return []; } }
+function storeSaved(arr) { try { localStorage.setItem(SAVED_KEY, JSON.stringify(arr)); } catch (e) {} }
+function snapshotInputs() {
+  const snap = {};
+  document.querySelectorAll("#inputs input, #inputs select").forEach((el) => {
+    if (!el.id) return;
+    snap[el.id] = el.type === "checkbox" ? el.checked : el.value;
+  });
+  snap.__platform = window.__platform;
+  snap.__tier = activeTier;
+  snap.__comps = getCompetitorPrices();
+  return snap;
+}
+function saveCurrent(name) {
+  const arr = loadSaved();
+  if (arr.length >= SAVED_MAX) {
+    alert(`Memory is full (${SAVED_MAX} items). Delete an item or use Clear all to free space.`);
+    return;
+  }
+  const c = gatherCtx();
+  const price = roundPrice(solvePrice(c, c.platform), c.rounding);
+  const e = economicsAt(price, c, c.platform);
+  const catName = CATEGORIES[+$("category").value] ? CATEGORIES[+$("category").value][0] : "Item";
+  const auto = ($("productName") && $("productName").value.trim()) || catName;
+  arr.unshift({
+    id: "s" + new Date().getTime() + Math.floor(Math.random() * 1000),
+    name: (name && name.trim()) || auto,
+    ts: formatDateTime(new Date()),
+    date: $("priceDate") ? $("priceDate").value : todayISO(),
+    platform: c.platform,
+    tier: (TIER_INFO[c.tier] || TIER_INFO.silver).label,
+    price: price,
+    profit: e.profit,
+    snap: snapshotInputs(),
+  });
+  storeSaved(arr);
+  renderSaved();
+  flash("Saved to memory ✓");
+}
+function deleteSaved(id) { storeSaved(loadSaved().filter((x) => x.id !== id)); renderSaved(); }
+function clearAllSaved() {
+  if (!loadSaved().length) { flash("Memory already empty"); return; }
+  if (confirm("Clear ALL saved calculations? This cannot be undone.")) { storeSaved([]); renderSaved(); flash("Memory cleared"); }
+}
+function loadSavedEntry(id) {
+  const entry = loadSaved().find((x) => x.id === id);
+  if (!entry) return;
+  const snap = entry.snap || {};
+  if (snap.__tier) { activeTier = snap.__tier; if ($("tier")) $("tier").value = snap.__tier; }
+  Object.keys(snap).forEach((k) => {
+    if (k.indexOf("__") === 0) return;
+    const el = $(k);
+    if (!el) return;
+    if (el.type === "checkbox") el.checked = snap[k]; else el.value = snap[k];
+  });
+  if (snap.__platform) setPlatform(snap.__platform);
+  $("compList").innerHTML = "";
+  if (Array.isArray(snap.__comps)) snap.__comps.forEach((v) => addCompRow(v));
+  updateTierUI();
+  render();
+  flash("Loaded: " + entry.name);
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
+}
+function renderSaved() {
+  const arr = loadSaved();
+  const cnt = arr.length;
+  if ($("memCount")) $("memCount").textContent = `${cnt} / ${SAVED_MAX}`;
+  if ($("menuMemCount")) $("menuMemCount").textContent = `${cnt} / ${SAVED_MAX} saved`;
+  const list = $("savedList");
+  if (!cnt) { list.innerHTML = `<div class="emptymsg">No saved calculations yet. Set up a product and tap <b>💾 Save to memory</b>.</div>`; return; }
+  list.innerHTML = arr.map((e) =>
+    `<div class="savedcard">
+       <div class="sc-main">
+         <div class="sc-name">${escapeHtml(e.name)}</div>
+         <div class="sc-meta">${e.platform === "shopsy" ? "Shopsy" : "Flipkart"} · ${escapeHtml(e.tier)} · profit ${inr2(e.profit)} · ${escapeHtml(e.ts)}</div>
+       </div>
+       <div class="sc-price">${inr(e.price)}</div>
+       <div class="sc-btns">
+         <button class="iconmini load" title="Load this calculation" data-load="${e.id}">↺</button>
+         <button class="iconmini del" title="Delete this entry" data-del="${e.id}">✕</button>
+       </div>
+     </div>`
+  ).join("");
+  list.querySelectorAll("[data-load]").forEach((b) => b.addEventListener("click", () => loadSavedEntry(b.dataset.load)));
+  list.querySelectorAll("[data-del]").forEach((b) => b.addEventListener("click", () => deleteSaved(b.dataset.del)));
+}
+function initSavedCalcs() {
+  $("btnSave").addEventListener("click", () => saveCurrent($("saveName") ? $("saveName").value : ""));
+  $("btnSaveNamed").addEventListener("click", () => { saveCurrent($("saveName").value); if ($("saveName")) $("saveName").value = ""; });
+  $("btnClearAll").addEventListener("click", clearAllSaved);
+  renderSaved();
+}
+
+/* ---- PWA: service worker + install flow ---- */
+function initPWA() {
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").catch(() => {}); });
+  }
+  const standalone = (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || window.navigator.standalone === true;
+
+  window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); deferredInstallPrompt = e; showInstallUI(); });
+  window.addEventListener("appinstalled", () => { deferredInstallPrompt = null; hideInstallUI(); flash("App installed ✓"); });
+
+  $("installBtn").addEventListener("click", doInstall);
+  $("menuInstall").addEventListener("click", () => { doInstall(); openMenu(false); });
+  $("installBarYes").addEventListener("click", doInstall);
+  $("installBarNo").addEventListener("click", () => {
+    try { localStorage.setItem(INSTALL_DISMISS_KEY, String(new Date().getTime())); } catch (e) {}
+    $("installBar").hidden = true;
+  });
+
+  if (standalone) { hideInstallUI(); return; }
+
+  // iOS Safari lacks beforeinstallprompt — surface manual Add-to-Home-Screen
+  const iOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+  if (iOS) { $("installBtn").hidden = false; maybeShowBanner(true); }
+}
+function showInstallUI() {
+  $("installBtn").hidden = false;
+  if ($("menuInstallRow")) $("menuInstallRow").style.display = "";
+  maybeShowBanner(false);
+}
+function hideInstallUI() {
+  $("installBtn").hidden = true;
+  $("installBar").hidden = true;
+  if ($("menuInstallRow")) $("menuInstallRow").style.display = "none";
+}
+function maybeShowBanner(iOS) {
+  let last = 0;
+  try { last = parseInt(localStorage.getItem(INSTALL_DISMISS_KEY) || "0", 10); } catch (e) {}
+  const days = (new Date().getTime() - last) / 86400000;
+  if (last && days < INSTALL_REMIND_DAYS) return; // respect a recent "Later" (< 1 day)
+  if (iOS) {
+    $("installBar").querySelector(".ib-txt").innerHTML =
+      "<b>Install IBI Calculator</b><small>In Safari: tap Share &#x2191; then “Add to Home Screen”.</small>";
+    $("installBarYes").style.display = "none";
+  }
+  $("installBar").hidden = false;
+}
+async function doInstall() {
+  if (!deferredInstallPrompt) {
+    alert("To install this app:\n\n• Android / Chrome / Edge: open the browser ⋮ menu → “Install app” / “Add to Home screen”.\n• iPhone / iPad (Safari): tap Share → “Add to Home Screen”.\n\n(On desktop, look for the install ⊕ icon in the address bar.)");
+    return;
+  }
+  deferredInstallPrompt.prompt();
+  try { await deferredInstallPrompt.userChoice; } catch (e) {}
+  deferredInstallPrompt = null;
+  $("installBar").hidden = true;
 }
 
 document.addEventListener("DOMContentLoaded", init);

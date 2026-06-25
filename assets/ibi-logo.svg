@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 545 196" role="img" aria-label="India Business International">
+  <g fill="#00c5ff">
+    <!-- halftone dot grid: 5 columns growing left->right, 5 rows -->
+    <circle cx="24" cy="24" r="4.5"/><circle cx="58" cy="24" r="7.5"/><circle cx="92" cy="24" r="10.5"/><circle cx="126" cy="24" r="13.5"/><circle cx="160" cy="24" r="16.5"/>
+    <circle cx="24" cy="58" r="4.5"/><circle cx="58" cy="58" r="7.5"/><circle cx="92" cy="58" r="10.5"/><circle cx="126" cy="58" r="13.5"/><circle cx="160" cy="58" r="16.5"/>
+    <circle cx="24" cy="92" r="4.5"/><circle cx="58" cy="92" r="7.5"/><circle cx="92" cy="92" r="10.5"/><circle cx="126" cy="92" r="13.5"/><circle cx="160" cy="92" r="16.5"/>
+    <circle cx="24" cy="126" r="4.5"/><circle cx="58" cy="126" r="7.5"/><circle cx="92" cy="126" r="10.5"/><circle cx="126" cy="126" r="13.5"/><circle cx="160" cy="126" r="16.5"/>
+    <circle cx="24" cy="160" r="4.5"/><circle cx="58" cy="160" r="7.5"/><circle cx="92" cy="160" r="10.5"/><circle cx="126" cy="160" r="13.5"/><circle cx="160" cy="160" r="16.5"/>
+  </g>
+  <line x1="198" y1="14" x2="198" y2="170" stroke="#00c5ff" stroke-width="2.5"/>
+  <g font-family="Roboto, 'Segoe UI', Arial, sans-serif" fill="#00c5ff">
+    <text x="220" y="55" font-size="40" font-weight="800" letter-spacing="0.5">INDIA</text>
+    <text x="220" y="101" font-size="40" font-weight="800" letter-spacing="0.5">BUSINESS</text>
+    <text x="220" y="147" font-size="40" font-weight="800" letter-spacing="0.5">INTERNATIONAL</text>
+    <text x="222" y="178" font-size="20" font-weight="400" opacity="0.7" letter-spacing="0.5">eCommerce for the World</text>
+  </g>
+</svg>

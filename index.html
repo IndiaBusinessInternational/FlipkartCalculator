@@ -2,35 +2,76 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="description" content="IBI Flipkart & Shopsy Pricing Calculator — fix your retail price with platform fees, eKart shipping, returns, GST and target profit margin built in." />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="description" content="IBI Flipkart & Shopsy Pricing Calculator — fix your retail price with platform fees, eKart shipping, returns, GST, seller tiers and target profit. By India Business International." />
+<meta name="theme-color" content="#000000" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+<meta name="apple-mobile-web-app-title" content="IBI Calc" />
 <title>IBI Flipkart &amp; Shopsy Pricing Calculator</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%232874F0'/><text x='50' y='70' font-size='60' text-anchor='middle' fill='%23FFE11B' font-family='Arial' font-weight='bold'>₹</text></svg>" />
+<link rel="icon" href="favicon.svg" type="image/svg+xml" />
+<link rel="icon" href="icons/favicon-32.png" sizes="32x32" type="image/png" />
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;0,900;1,400&display=swap" rel="stylesheet" />
 <style>
   :root{
+    --cyan:#00c5ff; --cyan-deep:#00a6d6;
     --fk-blue:#2874F0; --fk-blue-dark:#1a5dc8; --fk-yellow:#FFE11B;
     --shopsy:#9C1AB1; --shopsy-dark:#7d1290;
-    --bg:#f1f3f6; --card:#ffffff; --ink:#212121; --muted:#5a6472;
-    --line:#e3e7ee; --good:#1a8a4a; --good-bg:#e7f6ee; --bad:#d23b2f; --bad-bg:#fdeceb;
-    --warn:#b8860b; --warn-bg:#fff8e1; --shadow:0 1px 3px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.04);
-    --radius:10px;
+    --bg:#eef1f5; --card:#ffffff; --soft:#f5f7fa; --track:#e9edf3; --hl:var(--hl);
+    --ink:#16181d; --muted:#5a6472; --line:#e3e7ee;
+    --good:#1a8a4a; --good-bg:#e7f6ee; --bad:#d23b2f; --bad-bg:#fdeceb;
+    --warn:#b8860b; --warn-bg:#fff8e1;
+    --header-bg:#000000; --header-ink:#00c5ff;
+    --shadow:0 1px 3px rgba(0,0,0,.1),0 1px 2px rgba(0,0,0,.04);
+    --radius:12px;
+  }
+  html[data-theme="dark"]{
+    --bg:#0c0e12; --card:#161a20; --soft:#1c212a; --track:#232a35; --hl:#2c2710;
+    --ink:#e7edf3; --muted:#9aa6b4; --line:#2a313d;
+    --good:#34d07f; --good-bg:#10301f; --bad:#ff6b5e; --bad-bg:#3a1714;
+    --warn:#e0b64a; --warn-bg:#332a10;
+    --shadow:0 1px 3px rgba(0,0,0,.5),0 1px 2px rgba(0,0,0,.4);
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0}
-  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.45}
-  a{color:var(--fk-blue)}
-  header.app{background:linear-gradient(135deg,var(--fk-blue),var(--fk-blue-dark));color:#fff;padding:18px 20px;box-shadow:var(--shadow);position:sticky;top:0;z-index:30}
-  header.app .wrap{max-width:1240px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-  .logo{width:46px;height:46px;border-radius:12px;background:var(--fk-yellow);color:var(--fk-blue);display:grid;place-items:center;font-weight:800;font-size:22px;flex:none;box-shadow:0 2px 6px rgba(0,0,0,.2)}
-  header.app h1{font-size:20px;margin:0;font-weight:700;letter-spacing:.2px}
-  header.app .sub{font-size:12px;opacity:.92;margin-top:2px}
+  body{font-family:'Roboto',-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.45;-webkit-text-size-adjust:100%}
+  a{color:var(--cyan-deep)}
+  h1,h2,h3{font-family:'Roboto',sans-serif}
+  /* ---- Branded header: black background, cyan headings ---- */
+  header.app{background:var(--header-bg);color:#fff;padding:10px 16px;padding-top:calc(10px + env(safe-area-inset-top));box-shadow:0 2px 10px rgba(0,0,0,.45);position:sticky;top:0;z-index:40;border-bottom:2px solid var(--cyan)}
+  header.app .wrap{max-width:1280px;margin:0 auto;display:flex;align-items:center;gap:12px 14px;flex-wrap:wrap}
+  .brandcol{display:flex;align-items:center;gap:12px;min-width:0}
+  .ver{font-size:11px;font-weight:700;color:#000;background:var(--cyan);padding:3px 9px;border-radius:20px;white-space:nowrap;cursor:pointer;flex:none;box-shadow:0 0 10px rgba(0,197,255,.45)}
+  .ibilogo{height:46px;width:auto;display:block;flex:none}
+  .titlecol{min-width:0}
+  header.app h1{font-size:18px;margin:0;font-weight:900;letter-spacing:.2px;color:var(--header-ink);line-height:1.15}
+  header.app .clock{font-size:11.5px;color:#cfd6de;margin-top:3px;font-variant-numeric:tabular-nums;letter-spacing:.2px}
   header.app .spacer{flex:1}
-  .pill{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);padding:5px 10px;border-radius:20px;font-size:11.5px;white-space:nowrap}
+  .fklogo{height:36px;width:auto;flex:none;background:#ffffff;border-radius:8px;padding:3px 7px}
+  .headeractions{display:flex;align-items:center;gap:8px;flex:none}
+  .iconbtn{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.08);border:1px solid rgba(0,197,255,.4);color:var(--cyan);font-size:13px;font-weight:600;padding:7px 11px;border-radius:8px;cursor:pointer;font-family:inherit;transition:.15s;white-space:nowrap}
+  .iconbtn:hover{background:rgba(0,197,255,.16)}
+  .iconbtn.primary{background:var(--cyan);color:#001018;border-color:var(--cyan)}
+  .iconbtn.primary:hover{background:#33d2ff}
+  /* theme sliding switch (checked = dark) */
+  .switch{position:relative;display:inline-flex;align-items:center;width:54px;height:28px;flex:none;cursor:pointer}
+  .switch input{position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer;z-index:2}
+  .switch .track{position:absolute;inset:0;background:#2a2f38;border:1px solid rgba(0,197,255,.45);border-radius:20px;transition:.2s}
+  .switch .knob{position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:var(--cyan);transition:.2s;display:grid;place-items:center;font-size:12px}
+  .switch input:checked ~ .knob{left:29px}
+  .switch .knob::after{content:"🌞"}
+  .switch input:checked ~ .knob::after{content:"🌙"}
   main{max-width:1240px;margin:18px auto;padding:0 16px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:18px}
   @media(max-width:980px){main{grid-template-columns:1fr}}
   .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;overflow:hidden}
-  .card h2{font-size:13px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin:0;padding:13px 16px;border-bottom:1px solid var(--line);background:#fafbfc;display:flex;align-items:center;gap:8px}
+  .card h2{font-size:12.5px;text-transform:uppercase;letter-spacing:.7px;color:var(--header-ink);margin:0;padding:12px 16px;border-bottom:2px solid var(--cyan);background:var(--header-bg);display:flex;align-items:center;gap:8px;font-weight:700}
   .card h2 .ic{font-size:15px}
+  .card h2 .fk{color:#5b9bff} .card h2 .sh{color:#d873e8}
   .card .body{padding:14px 16px}
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
   .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
@@ -38,20 +79,20 @@
   label.field{display:block;margin-bottom:2px}
   label.field>span.lbl{display:block;font-size:12px;color:var(--muted);margin-bottom:4px;font-weight:600}
   label.field>span.lbl .hint{font-weight:400;color:#98a1ae;cursor:help}
-  input[type=number],input[type=text],select{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-size:14px;background:#fff;color:var(--ink);transition:border .15s,box-shadow .15s}
-  input:focus,select:focus{outline:none;border-color:var(--fk-blue);box-shadow:0 0 0 3px rgba(40,116,240,.12)}
+  input[type=number],input[type=text],input[type=date],select{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-size:14px;background:var(--card);color:var(--ink);transition:border .15s,box-shadow .15s;font-family:inherit}
+  input:focus,select:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,197,255,.18)}
   .inputgroup{position:relative}
   .inputgroup .prefix{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px;pointer-events:none}
   .inputgroup.prefixed input{padding-left:24px}
   .inputgroup .suffix{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px;pointer-events:none}
-  .seg{display:inline-flex;background:#eef1f6;border-radius:8px;padding:3px;gap:3px;flex-wrap:wrap}
+  .seg{display:inline-flex;background:var(--track);border-radius:8px;padding:3px;gap:3px;flex-wrap:wrap}
   .seg button{border:none;background:transparent;padding:7px 12px;border-radius:6px;font-size:13px;cursor:pointer;color:var(--muted);font-weight:600}
-  .seg button.active{background:#fff;color:var(--fk-blue);box-shadow:var(--shadow)}
+  .seg button.active{background:var(--card);color:var(--fk-blue);box-shadow:var(--shadow)}
   .seg.shopsy button.active{color:var(--shopsy)}
   .row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
   .toggle{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink);cursor:pointer;user-select:none}
   .toggle input{width:auto}
-  details.adv{border:1px dashed var(--line);border-radius:8px;margin-top:6px;background:#fafbfc}
+  details.adv{border:1px dashed var(--line);border-radius:8px;margin-top:6px;background:var(--soft)}
   details.adv>summary{cursor:pointer;padding:10px 12px;font-weight:600;font-size:12.5px;color:var(--muted);list-style:none}
   details.adv>summary::-webkit-details-marker{display:none}
   details.adv>summary::before{content:"▸ ";color:var(--fk-blue)}
@@ -59,12 +100,12 @@
   details.adv .inner{padding:0 12px 12px}
   table.fees{width:100%;border-collapse:collapse;font-size:12.5px}
   table.fees th,table.fees td{border:1px solid var(--line);padding:6px 8px;text-align:right}
-  table.fees th{background:#fafbfc;color:var(--muted);font-weight:600}
+  table.fees th{background:var(--soft);color:var(--muted);font-weight:600}
   table.fees td:first-child,table.fees th:first-child{text-align:left}
   table.fees input{padding:5px 6px;font-size:12.5px;text-align:right;border-radius:6px}
   .miniitems{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
   /* RESULTS */
-  .price-hero{padding:18px 16px;text-align:center;background:linear-gradient(135deg,#eaf2ff,#f7faff);border-bottom:1px solid var(--line)}
+  .price-hero{padding:18px 16px;text-align:center;background:linear-gradient(135deg,var(--soft),var(--card));border-bottom:1px solid var(--line)}
   .price-hero .tag{font-size:11.5px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);font-weight:700}
   .price-hero .big{font-size:42px;font-weight:800;color:var(--fk-blue);margin:4px 0 2px;line-height:1}
   .price-hero.shopsy-mode .big{color:var(--shopsy)}
@@ -72,14 +113,14 @@
   .price-hero .charm b{color:var(--ink)}
   .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line)}
   @media(max-width:520px){.kpis{grid-template-columns:1fr 1fr}}
-  .kpi{background:#fff;padding:11px 8px;text-align:center}
+  .kpi{background:var(--card);padding:11px 8px;text-align:center}
   .kpi .v{font-size:18px;font-weight:800}
   .kpi .l{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-top:2px}
   .kpi .v.good{color:var(--good)} .kpi .v.bad{color:var(--bad)}
   table.brk{width:100%;border-collapse:collapse;font-size:13px}
   table.brk td{padding:7px 16px;border-bottom:1px solid var(--line)}
   table.brk td:last-child{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
-  table.brk tr.head td{background:#fafbfc;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);padding-top:9px;padding-bottom:9px}
+  table.brk tr.head td{background:var(--soft);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);padding-top:9px;padding-bottom:9px}
   table.brk tr.sub td{color:var(--muted);font-size:12.5px}
   table.brk tr.sub td:first-child{padding-left:28px}
   table.brk tr.total td{font-weight:800;font-size:15px;border-top:2px solid var(--ink);border-bottom:none}
@@ -89,26 +130,26 @@
   .legend{display:flex;flex-wrap:wrap;gap:10px 16px;padding:0 16px 14px;font-size:11.5px;color:var(--muted)}
   .legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
   .market{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--line);border-radius:8px;overflow:hidden;border:1px solid var(--line)}
-  .market .m{background:#fff;padding:12px;text-align:center}
+  .market .m{background:var(--card);padding:12px;text-align:center}
   .market .m .l{font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
   .market .m .v{font-size:20px;font-weight:800;margin-top:3px}
-  .market .m.mid{background:#fff7e6}
-  .scale{position:relative;height:8px;border-radius:5px;margin:18px 6px 8px;background:linear-gradient(90deg,#e7f6ee,#fff7e6,#fdeceb)}
+  .market .m.mid{background:var(--hl)}
+  .scale{position:relative;height:8px;border-radius:5px;margin:18px 6px 8px;background:linear-gradient(90deg,#e7f6ee,var(--hl),#fdeceb)}
   .scale .you{position:absolute;top:-7px;width:3px;height:22px;background:var(--fk-blue);border-radius:2px}
   .scale .you::after{content:attr(data-l);position:absolute;top:-17px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--fk-blue);font-weight:700;white-space:nowrap}
   .cmp{width:100%;border-collapse:collapse;font-size:13px}
   .cmp th,.cmp td{padding:9px 12px;border-bottom:1px solid var(--line);text-align:right}
   .cmp th:first-child,.cmp td:first-child{text-align:left}
-  .cmp thead th{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);background:#fafbfc}
+  .cmp thead th{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);background:var(--soft)}
   .cmp .fk{color:var(--fk-blue);font-weight:700}
   .cmp .sh{color:var(--shopsy);font-weight:700}
   .cmp tr.winner{background:var(--good-bg)}
-  .btnrow{display:flex;gap:8px;flex-wrap:wrap;padding:14px 16px;border-top:1px solid var(--line);background:#fafbfc}
-  button.act{border:1px solid var(--line);background:#fff;color:var(--ink);padding:9px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:.15s}
+  .btnrow{display:flex;gap:8px;flex-wrap:wrap;padding:14px 16px;border-top:1px solid var(--line);background:var(--soft)}
+  button.act{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:9px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:.15s}
   button.act:hover{border-color:var(--fk-blue);color:var(--fk-blue)}
   button.act.primary{background:var(--fk-blue);color:#fff;border-color:var(--fk-blue)}
   button.act.primary:hover{background:var(--fk-blue-dark)}
-  .note{font-size:11.5px;color:var(--muted);padding:10px 16px;background:#fafbfc;border-top:1px solid var(--line)}
+  .note{font-size:11.5px;color:var(--muted);padding:10px 16px;background:var(--soft);border-top:1px solid var(--line)}
   .badge{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:20px;vertical-align:middle}
   .badge.good{background:var(--good-bg);color:var(--good)} .badge.bad{background:var(--bad-bg);color:var(--bad)} .badge.warn{background:var(--warn-bg);color:var(--warn)}
   .compactlist{font-size:12.5px;color:var(--muted);margin:6px 0 0;padding-left:18px}
@@ -116,30 +157,101 @@
   .alert{margin:0;padding:10px 16px;font-size:12.5px;border-left:4px solid var(--warn);background:var(--warn-bg);color:#7a5b00}
   .alert.bad{border-color:var(--bad);background:var(--bad-bg);color:#7a201a}
   footer{max-width:1240px;margin:8px auto 40px;padding:0 16px;color:var(--muted);font-size:11.5px}
-  footer .disc{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px}
+  footer .disc{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px}
   .srcs a{display:inline-block;margin-right:10px}
   .compitem{display:flex;gap:6px;margin-top:6px}
   .compitem input{flex:1}
-  .compitem button{flex:none;width:34px;border:1px solid var(--line);background:#fff;border-radius:8px;cursor:pointer;color:var(--bad);font-weight:700}
+  .compitem button{flex:none;width:34px;border:1px solid var(--line);background:var(--card);border-radius:8px;cursor:pointer;color:var(--bad);font-weight:700}
+  /* native controls follow theme (date picker, scrollbars) */
+  :root{color-scheme:light} html[data-theme="dark"]{color-scheme:dark}
+  html[data-theme="dark"] .alert{color:#ffd98a}
+  html[data-theme="dark"] .alert.bad{color:#ffb0a8}
+  /* ---- Settings menu ---- */
+  .menu{position:absolute;top:100%;right:12px;margin-top:8px;width:min(310px,94vw);background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 34px rgba(0,0,0,.35);overflow:hidden;z-index:60}
+  .menu .mhead{background:#000;color:var(--cyan);font-weight:700;font-size:12px;letter-spacing:.6px;text-transform:uppercase;padding:10px 14px;border-bottom:2px solid var(--cyan)}
+  .menu .mitem{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 14px;border-bottom:1px solid var(--line);font-size:13px}
+  .menu .mitem:last-child{border-bottom:none}
+  .menu .mlabel{display:flex;align-items:center;gap:9px;color:var(--ink)}
+  .menu .mlabel small{color:var(--muted);font-weight:400}
+  /* ---- Install banner ---- */
+  .installbar{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#001a22,#00323f);color:#eafaff;border-bottom:1px solid var(--cyan);padding:10px 16px;font-size:13px}
+  .installbar .ib-ic{font-size:22px;flex:none}
+  .installbar .ib-txt{flex:1;min-width:0}
+  .installbar .ib-txt b{color:var(--cyan)}
+  .installbar .ib-txt small{display:block;color:#9fc6d4;font-size:11.5px}
+  /* ---- Saved calculations (local memory) ---- */
+  .saved-row{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+  .saved-row input{flex:1}
+  .savedlist{display:flex;flex-direction:column;gap:8px;max-height:360px;overflow:auto}
+  .savedcard{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;padding:9px 11px;background:var(--soft)}
+  .savedcard .sc-main{flex:1;min-width:0}
+  .savedcard .sc-name{font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .savedcard .sc-meta{font-size:11px;color:var(--muted);margin-top:2px}
+  .savedcard .sc-price{font-weight:800;color:var(--cyan-deep);white-space:nowrap}
+  .savedcard .sc-btns{display:flex;gap:6px;flex:none}
+  .iconmini{width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:var(--card);cursor:pointer;font-size:13px;display:grid;place-items:center;color:var(--ink)}
+  .iconmini.del{color:var(--bad)} .iconmini.load{color:var(--cyan-deep)}
+  .memcount{font-size:11px;color:var(--muted);font-weight:600}
+  .emptymsg{font-size:12.5px;color:var(--muted);text-align:center;padding:16px}
+  /* ---- Mobile: edge-to-edge (no padding, bigger usable area) ---- */
+  @media(max-width:680px){
+    main{padding:0;margin:8px 0;gap:8px}
+    .card{border-radius:0;border-left:none;border-right:none;margin-bottom:8px}
+    header.app{padding-left:10px;padding-right:10px}
+    header.app h1{font-size:15px}
+    .ibilogo{height:38px}.fklogo{height:30px}
+    .iconbtn{padding:7px 9px;font-size:12px}
+    .iconbtn .lbl-full{display:none}
+    .menu{right:6px}
+    footer{padding:0 8px}
+  }
+  @media(max-width:420px){
+    .ver{font-size:10px;padding:2px 7px}
+    header.app h1{font-size:13px}
+    .headeractions{gap:6px}
+  }
   @media print{
-    header.app{position:static} .btnrow,.note,details.adv,.srcs,#liveStatus{display:none!important}
-    body{background:#fff} .card{box-shadow:none;break-inside:avoid}
-    main{grid-template-columns:1fr 1fr}
+    header.app,.installbar,.menu{position:static}
+    .btnrow,.note,details.adv,.srcs,#liveStatus,.installbar,.headeractions,.menu{display:none!important}
+    body{background:#fff;color:#000} .card{box-shadow:none;break-inside:avoid;border:1px solid #ccc}
+    main{grid-template-columns:1fr 1fr;padding:0}
   }
 </style>
 </head>
 <body>
 <header class="app">
   <div class="wrap">
-    <div class="logo">₹</div>
-    <div>
-      <h1>IBI Flipkart &amp; Shopsy Pricing Calculator</h1>
-      <div class="sub">India Business International · Fix your retail price with fees, eKart, returns, GST &amp; target profit built in</div>
+    <div class="brandcol">
+      <span class="ver" id="verChip" title="App version — click for details">v3.0</span>
+      <img class="ibilogo" id="ibiLogo" src="assets/ibi-logo.svg" alt="India Business International — eCommerce for the World" />
+    </div>
+    <div class="titlecol">
+      <h1>Flipkart &amp; Shopsy Pricing Calculator</h1>
+      <div class="clock" id="clock">—</div>
     </div>
     <div class="spacer"></div>
-    <span class="pill">Rates basis: Jun 2026 (Nov-2025 revision) · fully editable</span>
+    <img class="fklogo" src="assets/flipkart-logo.svg" alt="Flipkart" />
+    <div class="headeractions">
+      <button class="iconbtn primary" id="installBtn" type="button" title="Install this app" hidden>⤓ <span class="lbl-full">Install</span></button>
+      <label class="switch" title="Toggle dark / light theme"><input type="checkbox" id="themeToggle" /><span class="track"></span><span class="knob"></span></label>
+      <button class="iconbtn" id="menuBtn" type="button" title="Menu" aria-haspopup="true" aria-expanded="false">☰</button>
+    </div>
+  </div>
+  <div class="menu" id="settingsMenu" hidden>
+    <div class="mhead">Settings &amp; Info</div>
+    <div class="mitem"><span class="mlabel">🌓 Dark theme</span><label class="switch"><input type="checkbox" id="themeToggleMenu" /><span class="track"></span><span class="knob"></span></label></div>
+    <div class="mitem" id="menuInstallRow"><span class="mlabel">⤓ Install app <small>offline &amp; home-screen</small></span><button class="iconbtn" id="menuInstall" type="button">Install</button></div>
+    <div class="mitem"><span class="mlabel">🗑 Saved memory <small id="menuMemCount">0 / 24 saved</small></span><button class="act" id="menuClearMem" type="button" style="padding:6px 10px">Clear all</button></div>
+    <div class="mitem"><span class="mlabel">📅 Rates basis <small>Jun 2026 · Nov-2025 revision</small></span></div>
+    <div class="mitem"><span class="mlabel">ℹ️ Version <small id="menuVer">v3.0</small></span><a href="https://github.com/IndiaBusinessInternational/FlipkartCalculator" target="_blank" rel="noopener" class="iconbtn" style="text-decoration:none">GitHub</a></div>
   </div>
 </header>
+<div class="installbar" id="installBar" hidden>
+  <span class="ib-ic">⤓</span>
+  <div class="ib-txt"><b>Install IBI Calculator</b><small>Add to your home screen / desktop for one-tap, offline access.</small></div>
+  <button class="iconbtn primary" id="installBarYes" type="button">Install</button>
+  <button class="iconbtn" id="installBarNo" type="button">Later</button>
+</div>
 
 <main>
   <!-- ============== LEFT: INPUTS ============== -->
@@ -171,11 +283,19 @@
             </select>
           </label>
           <label class="field"><span class="lbl">Indicative settlement</span>
-            <input type="text" id="tierPayInfo" value="10 days" readonly style="background:#fafbfc;color:var(--muted)" />
+            <input type="text" id="tierPayInfo" value="10 days" readonly style="background:var(--soft);color:var(--muted)" />
           </label>
         </div>
         <div class="note" id="tierNote" style="padding:8px 0 0;background:none;border:none"></div>
         <label class="toggle" style="margin-top:8px"><input type="checkbox" id="zeroUnder1000" checked /> Apply Flipkart 0% commission for items priced under ₹1,000</label>
+        <div class="grid2" style="margin-top:10px">
+          <label class="field"><span class="lbl">Pricing date <span class="hint" title="Shown on prints/PDF and saved entries. Tap to pick from the calendar.">ⓘ</span></span>
+            <input type="date" id="priceDate" />
+          </label>
+          <label class="field"><span class="lbl">Product name / SKU (optional)</span>
+            <input type="text" id="productName" placeholder="e.g. Cotton Bedsheet Double" maxlength="60" />
+          </label>
+        </div>
       </div>
     </div>
 
@@ -436,10 +556,26 @@
       </div>
       <div id="alertBox"></div>
       <div class="btnrow">
-        <button type="button" class="act primary" id="btnPrint">🖨 Print / Save PDF</button>
+        <button type="button" class="act primary" id="btnSave">💾 Save to memory</button>
+        <button type="button" class="act" id="btnPrint">🖨 Print / Save PDF</button>
         <button type="button" class="act" id="btnCsv">⬇ Export CSV</button>
         <button type="button" class="act" id="btnCopy">📋 Copy summary</button>
         <button type="button" class="act" id="btnReset">↺ Reset inputs</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="ic">💾</span> Saved Calculations (Memory) <span id="memCount" class="memcount" style="margin-left:auto"></span></h2>
+      <div class="body">
+        <div class="saved-row">
+          <input type="text" id="saveName" placeholder="Name this calculation (defaults to product / category)" maxlength="60" />
+          <button type="button" class="act primary" id="btnSaveNamed" style="flex:none">＋ Save</button>
+        </div>
+        <div class="savedlist" id="savedList"></div>
+        <div class="row" style="justify-content:space-between;margin-top:10px">
+          <span class="memcount" id="memHint">Up to 24 entries stored on this device.</span>
+          <button type="button" class="act" id="btnClearAll" style="color:var(--bad)">🗑 Clear all</button>
+        </div>
       </div>
     </div>
 

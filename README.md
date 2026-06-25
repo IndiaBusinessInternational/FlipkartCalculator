@@ -1,8 +1,18 @@
-# IBI Flipkart &amp; Shopsy Pricing Calculator
+# IBI Flipkart &amp; Shopsy Pricing Calculator &nbsp;`v3.0`
 
-A zero-dependency web app that **fixes the right retail price** for products sold on **Flipkart** and **Shopsy** — accounting for every platform fee, eKart shipping, returns, GST and your target profit margin. Built for **India Business International (IBI)**.
+A zero-dependency, **installable (PWA)** web app that **fixes the right retail price** for products sold on **Flipkart** and **Shopsy** — accounting for every platform fee, eKart shipping, returns, GST, seller tier and your target profit margin. Built for **India Business International (IBI)**.
 
 > 🧮 It doesn't just add costs — it **solves** for the selling price at which, after *all* fees and costs, you still earn your target profit.
+
+### What's new in v3.0
+- 🎨 **Modern redesign** — Roboto typography, cyan-on-black (`#00c5ff`) headings, **dark / light theme switch**.
+- 🏷️ **IBI + Flipkart logos** in the header, **live date-time** clock, and a **version badge** (top-left).
+- 📲 **PWA**: install on phone/laptop, works **offline**; install button (top-right) + Settings menu entry + a banner that re-appears after 1 day (not 7).
+- 💾 **Local memory** — save up to **24** calculations, reload or delete each, or clear all.
+- 📱 **Edge-to-edge mobile** layout for maximum screen area.
+- 🗓️ **Calendar date-picker** for the pricing date.
+
+> **Versioning:** minor patches bump like `v3.1`; the next big feature release becomes `v4`.
 
 ---
 
@@ -67,6 +77,14 @@ Just **double-click `index.html`** — it works offline with no server or build 
 (Optional preview server, no Node/Python needed: `powershell -File serve.ps1 -Port 8123` then open `http://localhost:8123/`.)
 
 ---
+
+## 🎨 Branding / replacing the logo
+
+The header IBI logo is a crisp **SVG recreation** of the India Business International mark (cyan halftone grid + wordmark) at [`assets/ibi-logo.svg`](assets/ibi-logo.svg), in brand cyan `#00c5ff`. To use your exact artwork instead, either:
+- replace `assets/ibi-logo.svg` with your own SVG, **or**
+- drop a PNG at `assets/ibi-logo.png` and change the header `<img src="assets/ibi-logo.svg">` to `…ibi-logo.png` in `index.html`.
+
+App/PWA icons live in [`icons/`](icons/) and the favicon is [`favicon.svg`](favicon.svg) (the "IBI" mark). Regenerate PNG icons any time with `generate-icons.ps1` if you change the brand.
 
 ## 📐 How the price is calculated
 
