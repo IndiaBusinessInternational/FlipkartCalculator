@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="IBI Flipkart & Shopsy Pricing Calculator — fix your retail price with platform fees, eKart shipping, returns, GST and target profit margin built in." />
+<title>IBI Flipkart &amp; Shopsy Pricing Calculator</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%232874F0'/><text x='50' y='70' font-size='60' text-anchor='middle' fill='%23FFE11B' font-family='Arial' font-weight='bold'>₹</text></svg>" />
+<style>
+  :root{
+    --fk-blue:#2874F0; --fk-blue-dark:#1a5dc8; --fk-yellow:#FFE11B;
+    --shopsy:#9C1AB1; --shopsy-dark:#7d1290;
+    --bg:#f1f3f6; --card:#ffffff; --ink:#212121; --muted:#5a6472;
+    --line:#e3e7ee; --good:#1a8a4a; --good-bg:#e7f6ee; --bad:#d23b2f; --bad-bg:#fdeceb;
+    --warn:#b8860b; --warn-bg:#fff8e1; --shadow:0 1px 3px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.04);
+    --radius:10px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.45}
+  a{color:var(--fk-blue)}
+  header.app{background:linear-gradient(135deg,var(--fk-blue),var(--fk-blue-dark));color:#fff;padding:18px 20px;box-shadow:var(--shadow);position:sticky;top:0;z-index:30}
+  header.app .wrap{max-width:1240px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .logo{width:46px;height:46px;border-radius:12px;background:var(--fk-yellow);color:var(--fk-blue);display:grid;place-items:center;font-weight:800;font-size:22px;flex:none;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+  header.app h1{font-size:20px;margin:0;font-weight:700;letter-spacing:.2px}
+  header.app .sub{font-size:12px;opacity:.92;margin-top:2px}
+  header.app .spacer{flex:1}
+  .pill{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);padding:5px 10px;border-radius:20px;font-size:11.5px;white-space:nowrap}
+  main{max-width:1240px;margin:18px auto;padding:0 16px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:18px}
+  @media(max-width:980px){main{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;overflow:hidden}
+  .card h2{font-size:13px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin:0;padding:13px 16px;border-bottom:1px solid var(--line);background:#fafbfc;display:flex;align-items:center;gap:8px}
+  .card h2 .ic{font-size:15px}
+  .card .body{padding:14px 16px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  @media(max-width:520px){.grid2,.grid3{grid-template-columns:1fr}}
+  label.field{display:block;margin-bottom:2px}
+  label.field>span.lbl{display:block;font-size:12px;color:var(--muted);margin-bottom:4px;font-weight:600}
+  label.field>span.lbl .hint{font-weight:400;color:#98a1ae;cursor:help}
+  input[type=number],input[type=text],select{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-size:14px;background:#fff;color:var(--ink);transition:border .15s,box-shadow .15s}
+  input:focus,select:focus{outline:none;border-color:var(--fk-blue);box-shadow:0 0 0 3px rgba(40,116,240,.12)}
+  .inputgroup{position:relative}
+  .inputgroup .prefix{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px;pointer-events:none}
+  .inputgroup.prefixed input{padding-left:24px}
+  .inputgroup .suffix{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:13px;pointer-events:none}
+  .seg{display:inline-flex;background:#eef1f6;border-radius:8px;padding:3px;gap:3px;flex-wrap:wrap}
+  .seg button{border:none;background:transparent;padding:7px 12px;border-radius:6px;font-size:13px;cursor:pointer;color:var(--muted);font-weight:600}
+  .seg button.active{background:#fff;color:var(--fk-blue);box-shadow:var(--shadow)}
+  .seg.shopsy button.active{color:var(--shopsy)}
+  .row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .toggle{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink);cursor:pointer;user-select:none}
+  .toggle input{width:auto}
+  details.adv{border:1px dashed var(--line);border-radius:8px;margin-top:6px;background:#fafbfc}
+  details.adv>summary{cursor:pointer;padding:10px 12px;font-weight:600;font-size:12.5px;color:var(--muted);list-style:none}
+  details.adv>summary::-webkit-details-marker{display:none}
+  details.adv>summary::before{content:"▸ ";color:var(--fk-blue)}
+  details.adv[open]>summary::before{content:"▾ "}
+  details.adv .inner{padding:0 12px 12px}
+  table.fees{width:100%;border-collapse:collapse;font-size:12.5px}
+  table.fees th,table.fees td{border:1px solid var(--line);padding:6px 8px;text-align:right}
+  table.fees th{background:#fafbfc;color:var(--muted);font-weight:600}
+  table.fees td:first-child,table.fees th:first-child{text-align:left}
+  table.fees input{padding:5px 6px;font-size:12.5px;text-align:right;border-radius:6px}
+  .miniitems{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+  /* RESULTS */
+  .price-hero{padding:18px 16px;text-align:center;background:linear-gradient(135deg,#eaf2ff,#f7faff);border-bottom:1px solid var(--line)}
+  .price-hero .tag{font-size:11.5px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);font-weight:700}
+  .price-hero .big{font-size:42px;font-weight:800;color:var(--fk-blue);margin:4px 0 2px;line-height:1}
+  .price-hero.shopsy-mode .big{color:var(--shopsy)}
+  .price-hero .charm{font-size:13px;color:var(--muted)}
+  .price-hero .charm b{color:var(--ink)}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line)}
+  @media(max-width:520px){.kpis{grid-template-columns:1fr 1fr}}
+  .kpi{background:#fff;padding:11px 8px;text-align:center}
+  .kpi .v{font-size:18px;font-weight:800}
+  .kpi .l{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-top:2px}
+  .kpi .v.good{color:var(--good)} .kpi .v.bad{color:var(--bad)}
+  table.brk{width:100%;border-collapse:collapse;font-size:13px}
+  table.brk td{padding:7px 16px;border-bottom:1px solid var(--line)}
+  table.brk td:last-child{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+  table.brk tr.head td{background:#fafbfc;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);padding-top:9px;padding-bottom:9px}
+  table.brk tr.sub td{color:var(--muted);font-size:12.5px}
+  table.brk tr.sub td:first-child{padding-left:28px}
+  table.brk tr.total td{font-weight:800;font-size:15px;border-top:2px solid var(--ink);border-bottom:none}
+  table.brk tr.total td.pos{color:var(--good)} table.brk tr.total td.neg{color:var(--bad)}
+  .bar{display:flex;height:26px;border-radius:6px;overflow:hidden;margin:4px 16px 14px;border:1px solid var(--line)}
+  .bar span{height:100%;display:block}
+  .legend{display:flex;flex-wrap:wrap;gap:10px 16px;padding:0 16px 14px;font-size:11.5px;color:var(--muted)}
+  .legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+  .market{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--line);border-radius:8px;overflow:hidden;border:1px solid var(--line)}
+  .market .m{background:#fff;padding:12px;text-align:center}
+  .market .m .l{font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
+  .market .m .v{font-size:20px;font-weight:800;margin-top:3px}
+  .market .m.mid{background:#fff7e6}
+  .scale{position:relative;height:8px;border-radius:5px;margin:18px 6px 8px;background:linear-gradient(90deg,#e7f6ee,#fff7e6,#fdeceb)}
+  .scale .you{position:absolute;top:-7px;width:3px;height:22px;background:var(--fk-blue);border-radius:2px}
+  .scale .you::after{content:attr(data-l);position:absolute;top:-17px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--fk-blue);font-weight:700;white-space:nowrap}
+  .cmp{width:100%;border-collapse:collapse;font-size:13px}
+  .cmp th,.cmp td{padding:9px 12px;border-bottom:1px solid var(--line);text-align:right}
+  .cmp th:first-child,.cmp td:first-child{text-align:left}
+  .cmp thead th{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);background:#fafbfc}
+  .cmp .fk{color:var(--fk-blue);font-weight:700}
+  .cmp .sh{color:var(--shopsy);font-weight:700}
+  .cmp tr.winner{background:var(--good-bg)}
+  .btnrow{display:flex;gap:8px;flex-wrap:wrap;padding:14px 16px;border-top:1px solid var(--line);background:#fafbfc}
+  button.act{border:1px solid var(--line);background:#fff;color:var(--ink);padding:9px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:.15s}
+  button.act:hover{border-color:var(--fk-blue);color:var(--fk-blue)}
+  button.act.primary{background:var(--fk-blue);color:#fff;border-color:var(--fk-blue)}
+  button.act.primary:hover{background:var(--fk-blue-dark)}
+  .note{font-size:11.5px;color:var(--muted);padding:10px 16px;background:#fafbfc;border-top:1px solid var(--line)}
+  .badge{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:20px;vertical-align:middle}
+  .badge.good{background:var(--good-bg);color:var(--good)} .badge.bad{background:var(--bad-bg);color:var(--bad)} .badge.warn{background:var(--warn-bg);color:var(--warn)}
+  .compactlist{font-size:12.5px;color:var(--muted);margin:6px 0 0;padding-left:18px}
+  .compactlist li{margin:3px 0}
+  .alert{margin:0;padding:10px 16px;font-size:12.5px;border-left:4px solid var(--warn);background:var(--warn-bg);color:#7a5b00}
+  .alert.bad{border-color:var(--bad);background:var(--bad-bg);color:#7a201a}
+  footer{max-width:1240px;margin:8px auto 40px;padding:0 16px;color:var(--muted);font-size:11.5px}
+  footer .disc{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px}
+  .srcs a{display:inline-block;margin-right:10px}
+  .compitem{display:flex;gap:6px;margin-top:6px}
+  .compitem input{flex:1}
+  .compitem button{flex:none;width:34px;border:1px solid var(--line);background:#fff;border-radius:8px;cursor:pointer;color:var(--bad);font-weight:700}
+  @media print{
+    header.app{position:static} .btnrow,.note,details.adv,.srcs,#liveStatus{display:none!important}
+    body{background:#fff} .card{box-shadow:none;break-inside:avoid}
+    main{grid-template-columns:1fr 1fr}
+  }
+</style>
+</head>
+<body>
+<header class="app">
+  <div class="wrap">
+    <div class="logo">₹</div>
+    <div>
+      <h1>IBI Flipkart &amp; Shopsy Pricing Calculator</h1>
+      <div class="sub">India Business International · Fix your retail price with fees, eKart, returns, GST &amp; target profit built in</div>
+    </div>
+    <div class="spacer"></div>
+    <span class="pill">Rates basis: Jun 2026 (Nov-2025 revision) · fully editable</span>
+  </div>
+</header>
+
+<main>
+  <!-- ============== LEFT: INPUTS ============== -->
+  <section id="inputs">
+    <div class="card">
+      <h2><span class="ic">🛒</span> Platform &amp; Product</h2>
+      <div class="body">
+        <label class="field"><span class="lbl">Selling platform (primary result)</span>
+          <div class="seg" id="platformSeg">
+            <button type="button" data-v="flipkart" class="active">Flipkart</button>
+            <button type="button" data-v="shopsy">Shopsy</button>
+          </div>
+        </label>
+        <div class="grid2" style="margin-top:10px">
+          <label class="field"><span class="lbl">Product category <span class="hint" title="Sets the default Flipkart commission %. You can override the % in Advanced Fee Settings.">ⓘ</span></span>
+            <select id="category"></select>
+          </label>
+          <label class="field"><span class="lbl">Commission % (this category)</span>
+            <div class="inputgroup"><input type="number" id="commission" step="0.1" min="0" /><span class="suffix">%</span></div>
+          </label>
+        </div>
+        <label class="toggle" style="margin-top:8px"><input type="checkbox" id="zeroUnder1000" checked /> Apply Flipkart 0% commission for items priced under ₹1,000</label>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="ic">💰</span> Your Costs (per unit)</h2>
+      <div class="body">
+        <div class="grid2">
+          <label class="field"><span class="lbl">Wholesale Price (WSP) <span class="hint" title="Your purchase / landed cost of one unit.">ⓘ</span></span>
+            <div class="inputgroup prefixed"><span class="prefix">₹</span><input type="number" id="wsp" step="0.01" min="0" value="300" /></div>
+          </label>
+          <label class="field"><span class="lbl">Labour charges <span class="hint" title="Per-unit handling / packing labour.">ⓘ</span></span>
+            <div class="inputgroup prefixed"><span class="prefix">₹</span><input type="number" id="labour" step="0.01" min="0" value="8" /></div>
+          </label>
+        </div>
+
+        <label class="field" style="margin-top:10px"><span class="lbl">Packing charges (per unit)</span>
+          <div class="inputgroup prefixed"><span class="prefix">₹</span><input type="number" id="packing" step="0.01" min="0" value="18" /></div>
+        </label>
+        <details class="adv">
+          <summary>Itemise packing (carton, tape, label, invoice paper…)</summary>
+          <div class="inner">
+            <div class="miniitems">
+              <label class="field"><span class="lbl">Carton box</span><div class="inputgroup prefixed"><span class="prefix">₹</span><input type="number" class="pk" id="pk_carton" step="0.01" min="0" value="10" /></div></label>
+              <label class="field"><span class="lbl">Cello tape</span><div class="inputgroup prefixed"><span class="prefix">₹</span><input type="number" class="pk" id="pk_tape" step="0.01" min="0" value="2" /></div></label>
+              <label class="field"><span class="lbl">Shipping label paper</span><div class="inputgroup prefixed"><span class="prefix">₹</span><input type="number" class="pk" id="pk_label" step="0.01" min="0" value="3" /></div></label>
+              <label class="field"><span class="lbl">Invoice copy paper</span><div class="inputgroup prefixed"><span class="prefix">₹</span><input type="number" class="pk" id="pk_invoice" step="0.01" min="0" value="2" /></div></label>
+              <label class="field"><span class="lbl">Bubble wrap / filler</span><div class="inputgroup prefixed"><span class="prefix">₹</span><input type="number" class="pk" id="pk_filler" step="0.01" min="0" value="1" /></div></label>
+              <label class="field"><span class="lbl">Other</span><div class="inputgroup prefixed"><span class="prefix">₹</span><input type="number" class="pk" id="pk_other" step="0.01" min="0" value="0" /></div></label>
+            </div>
+            <div class="row" style="margin-top:8px;justify-content:space-between">
+              <span style="font-size:12px;color:var(--muted)">Sum of items: <b id="pkSum">₹0</b></span>
+              <button type="button" class="act" id="applyPacking">Use this as packing charge →</button>
+            </div>
+          </div>
+        </details>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="ic">📈</span> Profit &amp; GST</h2>
+      <div class="body">
+        <div class="grid2">
+          <label class="field"><span class="lbl">Target profit margin</span>
+            <div class="inputgroup"><input type="number" id="margin" step="0.5" min="0" value="25" /><span class="suffix">%</span></div>
+          </label>
+          <label class="field"><span class="lbl">Profit basis <span class="hint" title="Markup on cost: profit = % of your total cost. Margin on price: profit = % of the (pre-GST) selling price.">ⓘ</span></span>
+            <select id="profitBasis">
+              <option value="cost">Markup on total cost</option>
+              <option value="price">Margin on selling price</option>
+            </select>
+          </label>
+        </div>
+        <div class="grid2" style="margin-top:10px">
+          <label class="field"><span class="lbl">GST rate on product</span>
+            <select id="gst">
+              <option value="0">0% (exempt)</option>
+              <option value="3">3%</option>
+              <option value="5" selected>5%</option>
+              <option value="12">12%</option>
+              <option value="18">18%</option>
+              <option value="28">28%</option>
+            </select>
+          </label>
+          <label class="field"><span class="lbl">Price rounding</span>
+            <select id="rounding">
+              <option value="none">Exact (no rounding)</option>
+              <option value="1">Nearest ₹1</option>
+              <option value="5">Nearest ₹5</option>
+              <option value="10">Nearest ₹10</option>
+              <option value="charm" selected>Charm price (…99 / …49)</option>
+            </select>
+          </label>
+        </div>
+        <label class="toggle" style="margin-top:8px"><input type="checkbox" id="claimITC" checked /> I am GST-registered &amp; claim Input Tax Credit (ITC) on platform fees <span class="hint" title="ON (recommended for registered sellers): the 18% GST on Flipkart fees is reclaimed, so it is not a profit cost. OFF: treats fee-GST as a real cost (more conservative, slightly higher price).">ⓘ</span></label>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="ic">🚚</span> Logistics (eKart) &amp; Returns</h2>
+      <div class="body">
+        <div class="grid2">
+          <label class="field"><span class="lbl">Delivery zone <span class="hint" title="Local = same city. Regional/Zonal = same state/region. National = across India. Drives eKart shipping cost.">ⓘ</span></span>
+            <select id="zone">
+              <option value="local">Local (same city)</option>
+              <option value="zonal" selected>Regional / Zonal (same state)</option>
+              <option value="national">National (pan-India)</option>
+            </select>
+          </label>
+          <label class="field"><span class="lbl">Shipping weight (grams) <span class="hint" title="Use the higher of actual or volumetric weight. Use the helper below to compute volumetric.">ⓘ</span></span>
+            <input type="number" id="weight" step="10" min="1" value="500" />
+          </label>
+        </div>
+        <details class="adv">
+          <summary>Volumetric weight helper (L × W × H ÷ 5000)</summary>
+          <div class="inner">
+            <div class="grid3">
+              <label class="field"><span class="lbl">Length (cm)</span><input type="number" id="dimL" step="0.5" min="0" value="20" /></label>
+              <label class="field"><span class="lbl">Width (cm)</span><input type="number" id="dimW" step="0.5" min="0" value="15" /></label>
+              <label class="field"><span class="lbl">Height (cm)</span><input type="number" id="dimH" step="0.5" min="0" value="6" /></label>
+            </div>
+            <div class="row" style="margin-top:8px;justify-content:space-between">
+              <span style="font-size:12px;color:var(--muted)">Volumetric: <b id="volOut">—</b></span>
+              <button type="button" class="act" id="applyVol">Use higher weight →</button>
+            </div>
+          </div>
+        </details>
+
+        <div class="grid2" style="margin-top:10px">
+          <label class="field"><span class="lbl">Fulfilment</span>
+            <select id="fulfil">
+              <option value="nfbf" selected>Self-ship (NFBF)</option>
+              <option value="fbf">Flipkart fulfilled (FBF)</option>
+            </select>
+          </label>
+          <label class="field"><span class="lbl">COD share of orders <span class="hint" title="Cash-on-delivery orders cost a higher collection fee and have more returns.">ⓘ</span></span>
+            <div class="inputgroup"><input type="number" id="codShare" step="1" min="0" max="100" value="55" /><span class="suffix">%</span></div>
+          </label>
+        </div>
+
+        <div class="grid3" style="margin-top:10px">
+          <label class="field"><span class="lbl">Return rate <span class="hint" title="% of sold units that come back (returns + RTO). Default 10%.">ⓘ</span></span>
+            <div class="inputgroup"><input type="number" id="returnRate" step="0.5" min="0" max="100" value="10" /><span class="suffix">%</span></div>
+          </label>
+          <label class="field"><span class="lbl">Damaged on return <span class="hint" title="% of returned units that come back unsellable — you lose the WSP on these.">ⓘ</span></span>
+            <div class="inputgroup"><input type="number" id="damageRate" step="1" min="0" max="100" value="15" /><span class="suffix">%</span></div>
+          </label>
+          <label class="field"><span class="lbl">Reverse ship / return</span>
+            <div class="inputgroup prefixed"><span class="prefix">₹</span><input type="number" id="reverseShip" step="1" min="0" value="0" /></div>
+          </label>
+        </div>
+        <label class="toggle" style="margin-top:8px"><input type="checkbox" id="autoReverse" checked /> Auto-fill reverse shipping from zone &amp; weight</label>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="ic">➕</span> Other Costs &amp; Market</h2>
+      <div class="body">
+        <div class="grid2">
+          <label class="field"><span class="lbl">Advertising / PLA <span class="hint" title="Flipkart Ads spend as % of selling price. Most sellers run 3–8%.">ⓘ</span></span>
+            <div class="inputgroup"><input type="number" id="adsRate" step="0.5" min="0" value="0" /><span class="suffix">%</span></div>
+          </label>
+          <label class="field"><span class="lbl">Other cost / unit <span class="hint" title="Anything else: overheads, storage, insurance, etc.">ⓘ</span></span>
+            <div class="inputgroup prefixed"><span class="prefix">₹</span><input type="number" id="otherCost" step="0.5" min="0" value="0" /></div>
+          </label>
+        </div>
+        <div class="grid2" style="margin-top:10px">
+          <label class="field"><span class="lbl">Market spread − (below your price)</span>
+            <div class="inputgroup"><input type="number" id="spreadDown" step="1" min="0" value="8" /><span class="suffix">%</span></div>
+          </label>
+          <label class="field"><span class="lbl">Market spread + (above your price)</span>
+            <div class="inputgroup"><input type="number" id="spreadUp" step="1" min="0" value="22" /><span class="suffix">%</span></div>
+          </label>
+        </div>
+        <details class="adv" style="margin-top:10px">
+          <summary>Add competitor prices (compute real market min / max / avg)</summary>
+          <div class="inner">
+            <div id="compList"></div>
+            <button type="button" class="act" id="addComp" style="margin-top:8px">+ Add competitor price</button>
+          </div>
+        </details>
+        <label class="field" style="margin-top:10px"><span class="lbl">Expected sales / month (optional → monthly projection)</span>
+          <input type="number" id="unitsMonth" step="1" min="0" value="0" />
+        </label>
+      </div>
+    </div>
+
+    <!-- ADVANCED FEE SETTINGS -->
+    <div class="card">
+      <h2><span class="ic">⚙️</span> Advanced Fee Settings (editable rate card)</h2>
+      <div class="body">
+        <p class="note" style="padding:0 0 8px;background:none;border:none">Defaults reflect Flipkart's Nov-2025 revision (Gold tier) as published mid-2026. Exact rates depend on your seller tier / sub-category — overwrite any cell with the figures from your <b>Seller Hub → Reports → My Commission Structure</b>. Changes are saved in your browser.</p>
+
+        <div class="grid2">
+          <label class="field"><span class="lbl">Collection fee — Prepaid</span><div class="inputgroup"><input type="number" id="collPrepaid" step="0.1" min="0" value="2" /><span class="suffix">%</span></div></label>
+          <label class="field"><span class="lbl">Collection fee — COD</span><div class="inputgroup"><input type="number" id="collCod" step="0.1" min="0" value="2.5" /><span class="suffix">%</span></div></label>
+        </div>
+        <div class="grid2" style="margin-top:10px">
+          <label class="field"><span class="lbl">GST on platform fees</span><div class="inputgroup"><input type="number" id="feeGst" step="0.1" min="0" value="18" /><span class="suffix">%</span></div></label>
+          <label class="field"><span class="lbl">Commission charged on</span>
+            <select id="commBase">
+              <option value="gross" selected>Selling price (incl. GST)</option>
+              <option value="net">Taxable value (excl. GST)</option>
+            </select>
+          </label>
+        </div>
+
+        <details class="adv" style="margin-top:12px" open>
+          <summary>Fixed (closing) fee by price slab — ₹</summary>
+          <div class="inner">
+            <table class="fees">
+              <thead><tr><th>Order value up to (₹)</th><th>Self-ship (NFBF)</th><th>Flipkart (FBF)</th></tr></thead>
+              <tbody id="fixedTable"></tbody>
+            </table>
+          </div>
+        </details>
+
+        <details class="adv" style="margin-top:8px">
+          <summary>eKart forward shipping rate card — ₹</summary>
+          <div class="inner">
+            <table class="fees">
+              <thead><tr><th>Weight up to</th><th>Local</th><th>Regional</th><th>National</th></tr></thead>
+              <tbody id="shipTable"></tbody>
+            </table>
+            <div class="grid3" style="margin-top:8px">
+              <label class="field"><span class="lbl">Beyond top slab, per extra kg — Local</span><div class="inputgroup prefixed"><span class="prefix">₹</span><input type="number" id="shipBeyondLocal" step="1" min="0" value="10" /></div></label>
+              <label class="field"><span class="lbl">Regional</span><div class="inputgroup prefixed"><span class="prefix">₹</span><input type="number" id="shipBeyondZonal" step="1" min="0" value="12" /></div></label>
+              <label class="field"><span class="lbl">National</span><div class="inputgroup prefixed"><span class="prefix">₹</span><input type="number" id="shipBeyondNational" step="1" min="0" value="15" /></div></label>
+            </div>
+          </div>
+        </details>
+
+        <details class="adv" style="margin-top:8px">
+          <summary>eKart reverse (return) shipping base — ₹ (per return, up to 500g)</summary>
+          <div class="inner">
+            <div class="grid3">
+              <label class="field"><span class="lbl">Local</span><div class="inputgroup prefixed"><span class="prefix">₹</span><input type="number" id="revLocal" step="1" min="0" value="65" /></div></label>
+              <label class="field"><span class="lbl">Regional</span><div class="inputgroup prefixed"><span class="prefix">₹</span><input type="number" id="revZonal" step="1" min="0" value="85" /></div></label>
+              <label class="field"><span class="lbl">National</span><div class="inputgroup prefixed"><span class="prefix">₹</span><input type="number" id="revNational" step="1" min="0" value="105" /></div></label>
+            </div>
+            <label class="field" style="margin-top:8px"><span class="lbl">Add per extra 500g beyond base</span><div class="inputgroup prefixed"><span class="prefix">₹</span><input type="number" id="revPer500" step="1" min="0" value="30" /></div></label>
+          </div>
+        </details>
+
+        <details class="adv" style="margin-top:8px">
+          <summary>Tax withheld at settlement — TCS &amp; TDS (informational)</summary>
+          <div class="inner">
+            <div class="grid2">
+              <label class="field"><span class="lbl">TCS (GST)</span><div class="inputgroup"><input type="number" id="tcs" step="0.1" min="0" value="1" /><span class="suffix">%</span></div></label>
+              <label class="field"><span class="lbl">TDS (Sec 194-O)</span><div class="inputgroup"><input type="number" id="tds" step="0.1" min="0" value="0.1" /><span class="suffix">%</span></div></label>
+            </div>
+            <label class="toggle" style="margin-top:8px"><input type="checkbox" id="showTax" checked /> Show TCS/TDS in the breakdown (these are adjustable against your tax liability — not a true cost)</label>
+          </div>
+        </details>
+
+        <button type="button" class="act" id="resetFees" style="margin-top:12px">↺ Reset rate card to Jun-2026 defaults</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== RIGHT: RESULTS ============== -->
+  <section id="results">
+    <div class="card">
+      <div class="price-hero" id="priceHero">
+        <div class="tag" id="heroTag">Recommended Retail Price · Flipkart</div>
+        <div class="big" id="heroPrice">₹0</div>
+        <div class="charm" id="heroCharm"></div>
+      </div>
+      <div class="kpis">
+        <div class="kpi"><div class="v" id="kpiProfit">₹0</div><div class="l">Net profit / unit</div></div>
+        <div class="kpi"><div class="v" id="kpiMargin">0%</div><div class="l">Net margin</div></div>
+        <div class="kpi"><div class="v" id="kpiMarkup">0%</div><div class="l">Markup on cost</div></div>
+        <div class="kpi"><div class="v" id="kpiRoi">0%</div><div class="l">Return on cost</div></div>
+      </div>
+      <div id="alertBox"></div>
+      <div class="btnrow">
+        <button type="button" class="act primary" id="btnPrint">🖨 Print / Save PDF</button>
+        <button type="button" class="act" id="btnCsv">⬇ Export CSV</button>
+        <button type="button" class="act" id="btnCopy">📋 Copy summary</button>
+        <button type="button" class="act" id="btnReset">↺ Reset inputs</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="ic">🧾</span> Price Build-up &amp; Settlement <span id="brkPlatform" style="margin-left:auto;font-weight:700"></span></h2>
+      <table class="brk" id="breakdown"></table>
+      <div class="bar" id="costBar"></div>
+      <div class="legend" id="costLegend"></div>
+    </div>
+
+    <div class="card">
+      <h2><span class="ic">🏷️</span> Estimated Market Price</h2>
+      <div class="body">
+        <div class="market">
+          <div class="m"><div class="l">Minimum</div><div class="v" id="mktMin">₹0</div></div>
+          <div class="m mid"><div class="l">Average</div><div class="v" id="mktAvg">₹0</div></div>
+          <div class="m"><div class="l">Maximum</div><div class="v" id="mktMax">₹0</div></div>
+        </div>
+        <div class="scale"><span class="you" id="youMark" data-l="You"></span></div>
+        <p class="compactlist" id="mktNote" style="list-style:none;padding-left:0"></p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="ic">⚖️</span> Flipkart vs Shopsy <span class="badge good" style="margin-left:8px">same target profit</span></h2>
+      <div class="body" style="padding:0">
+        <table class="cmp" id="cmpTable"></table>
+      </div>
+      <div class="note" id="cmpNote"></div>
+    </div>
+
+    <div class="card" id="monthlyCard" style="display:none">
+      <h2><span class="ic">📅</span> Monthly Projection</h2>
+      <table class="brk" id="monthly"></table>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="disc">
+    <b>How the math works (transparent by design):</b>
+    <ul class="compactlist">
+      <li>Platform fees (commission, fixed, eKart shipping, collection) all depend on the selling price, so the app <b>solves</b> for the price that delivers your target profit after every fee and cost — not a rough add-on.</li>
+      <li><b>Returns:</b> for the return % you set, each returned unit is provisioned with lost forward shipping + reverse shipping + damage loss (WSP) + re-pack/labour for resold units.</li>
+      <li><b>GST:</b> the retail price is shown GST-inclusive. For a registered seller claiming ITC, product GST is pass-through and the 18% GST on fees is reclaimed; switch ITC off for a conservative price.</li>
+      <li><b>Market price</b> is an estimate from your spread settings; add competitor prices for a real min/max/average.</li>
+    </ul>
+    <p style="margin:10px 0 4px"><b>Disclaimer:</b> Fee defaults reflect Flipkart's Nov-2025 rate revision (Gold tier) as published in mid-2026 and are <b>indicative</b>. Actual commission, fixed fee and eKart rates vary by seller tier, category, sub-category and your specific rate card. Always confirm in <b>Flipkart Seller Hub → Reports → My Commission Structure</b> and overwrite the rate card here. Not affiliated with Flipkart / Shopsy.</p>
+    <div class="srcs" style="margin-top:8px">Sources:
+      <a href="https://seller.flipkart.com/fees-and-commission" target="_blank" rel="noopener">Flipkart Fees &amp; Commission</a>
+      <a href="https://seller.flipkart.com/shopsy" target="_blank" rel="noopener">Shopsy 0% Commission</a>
+      <a href="https://rekonsile.com/flipkart-fee-revision-november-2025-complete-guide" target="_blank" rel="noopener">Nov-2025 Fee Revision</a>
+    </div>
+    <p id="liveStatus" style="margin-top:8px;color:#98a1ae"></p>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+# Local preview server logs / artifacts
+.serve.log
+.serve.log.out
+
+# Claude Code local preview config (machine-specific absolute paths)
+.claude/
+
+# OS / editor
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+*.swp
+.vscode/
+.idea/
