@@ -1,7 +1,7 @@
 /* IBI Flipkart & Shopsy Calculator — service worker
    Offline-first app shell with stale-while-revalidate.
    Bump CACHE on every release so clients pick up updates. */
-const CACHE = "ibi-calc-v3.2.0";
+const CACHE = "ibi-calc-v3.3.0";
 const SHELL = [
   "./",
   "./index.html",

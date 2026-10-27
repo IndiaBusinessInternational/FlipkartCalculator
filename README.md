@@ -1,8 +1,11 @@
-# IBI Flipkart &amp; Shopsy Pricing Calculator &nbsp;`v3.2`
+# IBI Flipkart &amp; Shopsy Pricing Calculator &nbsp;`v3.3`
 
 A zero-dependency, **installable (PWA)** web app that **fixes the right retail price** for products sold on **Flipkart** and **Shopsy** — accounting for every platform fee, eKart shipping, returns, GST, seller tier and your target profit margin. Built for **India Business International (IBI)**.
 
 > 🧮 It doesn't just add costs — it **solves** for the selling price at which, after *all* fees and costs, you still earn your target profit.
+
+### What's new in v3.3
+- ↔️ **Edge to edge on laptops too** (CEO, 27 Oct 2026): no 1240px centred column; the inputs and results columns run to the screen edges side by side, cards are full-bleed with 10px inner side padding, header 10px, page never wider than the screen. Phones stack the columns as before.
 
 ### What's new in v3.2
 - 🔗 **Share this app** button in the header (`ibi-share.js`): WhatsApp, Facebook, X, Telegram, Email, Copy link.

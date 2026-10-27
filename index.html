@@ -230,6 +230,26 @@
     header.app h1{font-size:13px}
     .headeractions{gap:6px}
   }
+  /* ---- v3.3 edge to edge on EVERY screen (CEO, 27 Oct 2026: "make all the apps edge to edge on laptop too") ----
+     No 1240px centred column: the inputs and results columns run to the screen edges, cards are
+     full-bleed (no side border, radius or shadow), 10px inner side padding, header 10px, the page is
+     never wider than the screen (clip, not hidden, so the sticky header keeps working). Wide screens
+     keep the two columns side by side; phones stack them (<=980px), as before. */
+  html,body{overflow-x:clip}
+  header.app{padding-left:10px;padding-right:10px}
+  header.app .wrap{max-width:none}
+  .installbar{padding-left:10px;padding-right:10px}
+  main{max-width:none;margin:8px 0;padding:0;gap:8px}
+  main .card{border-radius:0;border-left:none;border-right:none;box-shadow:none;margin-bottom:8px}
+  html[data-theme="dark"] main .card{box-shadow:none}
+  .card h2,.card .body,.btnrow,.note,.alert,.price-hero{padding-left:10px;padding-right:10px}
+  table.brk td{padding-left:10px;padding-right:10px}
+  table.brk tr.sub td:first-child{padding-left:22px}
+  .bar{margin-left:10px;margin-right:10px}
+  .legend{padding-left:10px;padding-right:10px}
+  .card .body,.note,.alert,footer .disc{overflow-wrap:break-word}
+  footer{max-width:none;margin:0 0 40px;padding:0}
+  footer .disc{border-radius:0;border-left:none;border-right:none;padding-left:10px;padding-right:10px}
   /* ---- One-tap printable price quote ---- */
   #quoteSheet{display:none}
   #quoteSheet .qs-head{background:#000;padding:18px 22px;text-align:center}
@@ -260,7 +280,7 @@
 <header class="app">
   <div class="wrap">
     <div class="brandcol">
-      <span class="ver" id="verChip" title="App version — click for details">v3.2</span>
+      <span class="ver" id="verChip" title="App version — click for details">v3.3</span>
       <img class="ibilogo" id="ibiLogo" src="assets/ibi-logo.svg" alt="India Business International — eCommerce for the World" />
     </div>
     <div class="titlecol">
@@ -281,7 +301,7 @@
     <div class="mitem" id="menuInstallRow"><span class="mlabel">⤓ Install app <small>offline &amp; home-screen</small></span><button class="iconbtn" id="menuInstall" type="button">Install</button></div>
     <div class="mitem"><span class="mlabel">🗑 Saved memory <small id="menuMemCount">0 / 24 saved</small></span><button class="act" id="menuClearMem" type="button" style="padding:6px 10px">Clear all</button></div>
     <div class="mitem"><span class="mlabel">📅 Rates basis <small>Jun 2026 · Nov-2025 revision</small></span></div>
-    <div class="mitem"><span class="mlabel">ℹ️ Version <small id="menuVer">v3.2</small></span><a href="https://github.com/IndiaBusinessInternational/FlipkartCalculator" target="_blank" rel="noopener" class="iconbtn" style="text-decoration:none">GitHub</a></div>
+    <div class="mitem"><span class="mlabel">ℹ️ Version <small id="menuVer">v3.3</small></span><a href="https://github.com/IndiaBusinessInternational/FlipkartCalculator" target="_blank" rel="noopener" class="iconbtn" style="text-decoration:none">GitHub</a></div>
   </div>
 </header>
 <div class="installbar" id="installBar" hidden>
