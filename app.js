@@ -796,7 +796,7 @@ function bindDynamic() {
 /* ====================================================================
    v3 EXTRAS — branding, live clock, theme toggle, saved memory, PWA
    ==================================================================== */
-const APP_VERSION = "3.1";
+const APP_VERSION = "3.2";
 const SAVED_KEY = "ibi_calc_saved_v1";
 const THEME_KEY = "ibi_calc_theme";
 const INSTALL_DISMISS_KEY = "ibi_calc_install_dismissed";
