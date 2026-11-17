@@ -273,6 +273,9 @@
     body.quote-mode header.app,body.quote-mode main,body.quote-mode footer,body.quote-mode .installbar{display:none!important}
     body.quote-mode #quoteSheet{display:block!important}
   }
+
+/* one-scroll (17 Nov 2026, Founder: "Do the same one-scroll fix in all IBI apps"): lists grow with the page, no scroll box of their own */
+.savedlist{max-height:none!important;overflow:visible!important}
 </style>
 <script src="ibi-share.js" defer data-slot=".headeractions"></script>
 </head>
@@ -280,7 +283,7 @@
 <header class="app">
   <div class="wrap">
     <div class="brandcol">
-      <span class="ver" id="verChip" title="App version — click for details">v3.3</span>
+      <span class="ver" id="verChip" title="App version — click for details">v3.4</span>
       <img class="ibilogo" id="ibiLogo" src="assets/ibi-logo.svg" alt="India Business International — eCommerce for the World" />
     </div>
     <div class="titlecol">
@@ -301,7 +304,7 @@
     <div class="mitem" id="menuInstallRow"><span class="mlabel">⤓ Install app <small>offline &amp; home-screen</small></span><button class="iconbtn" id="menuInstall" type="button">Install</button></div>
     <div class="mitem"><span class="mlabel">🗑 Saved memory <small id="menuMemCount">0 / 24 saved</small></span><button class="act" id="menuClearMem" type="button" style="padding:6px 10px">Clear all</button></div>
     <div class="mitem"><span class="mlabel">📅 Rates basis <small>Jun 2026 · Nov-2025 revision</small></span></div>
-    <div class="mitem"><span class="mlabel">ℹ️ Version <small id="menuVer">v3.3</small></span><a href="https://github.com/IndiaBusinessInternational/FlipkartCalculator" target="_blank" rel="noopener" class="iconbtn" style="text-decoration:none">GitHub</a></div>
+    <div class="mitem"><span class="mlabel">ℹ️ Version <small id="menuVer">v3.4</small></span><a href="https://github.com/IndiaBusinessInternational/FlipkartCalculator" target="_blank" rel="noopener" class="iconbtn" style="text-decoration:none">GitHub</a></div>
   </div>
 </header>
 <div class="installbar" id="installBar" hidden>
